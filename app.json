@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "ReefPulse",
+    "slug": "reefpulse",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.reefpulse.app" },
+    "android": { "package": "com.reefpulse.app", "adaptiveIcon": { "backgroundColor": "#020617" } },
+    "web": { "bundler": "metro" }
+  }
+}
