@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from "./storage";
 
-const get = async (k) => { try { const d = await AsyncStorage.getItem(k); return d ? JSON.parse(d) : null; } catch { return null; } };
-const set = async (k, v) => { try { await AsyncStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const get = async (k) => { try { const d = await storage.getItem(k); return d ? JSON.parse(d) : null; } catch { return null; } };
+const set = async (k, v) => { try { await storage.setItem(k, JSON.stringify(v)); } catch {} };
 
 export async function getDatabase() { return true; }
 export async function addEntry(entry) { const e = (await get('entries')) || []; entry.id = Date.now(); e.push(entry); await set('entries', e); return entry.id; }

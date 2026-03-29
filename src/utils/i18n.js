@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from "./storage";
 
 const T = {
   en: {
@@ -311,12 +311,12 @@ export function I18nProvider({ children }) {
   const [lang, setLangState] = useState('en');
 
   useEffect(() => {
-    AsyncStorage.getItem('reefpulse_lang').then(l => { if (l && T[l]) setLangState(l); });
+    storage.getItem('reefpulse_lang').then(l => { if (l && T[l]) setLangState(l); });
   }, []);
 
   const setLang = async (l) => {
     setLangState(l);
-    await AsyncStorage.setItem('reefpulse_lang', l);
+    await storage.setItem('reefpulse_lang', l);
   };
 
   return (
