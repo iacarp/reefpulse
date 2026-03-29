@@ -32,7 +32,7 @@ const WebStorage = {
   }
 };
 
-// Use localStorage on web, AsyncStorage on native
-const storage = Platform.OS === 'web' ? WebStorage : AsyncStorage;
+// Use localStorage on web (detect by typeof window), AsyncStorage on native
+const storage = (typeof window !== 'undefined' && typeof document !== 'undefined') ? WebStorage : AsyncStorage;
 
 export default storage;
