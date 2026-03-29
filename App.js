@@ -30,6 +30,38 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 
 const Tab = createBottomTabNavigator();
 
+// Error Boundary
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ReefPulse Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, backgroundColor: '#020617', padding: 20, justifyContent: 'center' }}>
+          <Text style={{ color: '#ef4444', fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+            ⚠️ Error
+          </Text>
+          <Text style={{ color: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}>
+            {this.state.error?.message}
+          </Text>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function AppContent() {
   const { t } = useI18n();
   const [user, setUser] = useState(null);
@@ -165,8 +197,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <I18nProvider>
-      <AppContent />
-    </I18nProvider>
+    <ErrorBoundary>
+      <I18nProvider>
+        <AppContent />
+      </I18nProvider>
+    </ErrorBoundary>
   );
 }

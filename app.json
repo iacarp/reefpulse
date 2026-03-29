@@ -8,6 +8,6 @@
     "assetBundlePatterns": ["**/*"],
     "ios": { "supportsTablet": true, "bundleIdentifier": "com.reefpulse.app" },
     "android": { "package": "com.reefpulse.app", "adaptiveIcon": { "backgroundColor": "#020617" } },
-    "web": { "bundler": "metro" }
+    "web": { "bundler": "metro", "entry": "web-entry.js" }
   }
 }
