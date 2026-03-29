@@ -1,11 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
+
+// Simple SHA256-like hash for web (not production-level crypto)
+const simpleHash = async (str) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 const hashPassword = async (password) => {
-  return await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    password
-  );
+  try {
+    return await simpleHash(password);
+  } catch (err) {
+    // Fallback for environments without crypto.subtle
+    return btoa(password); // Base64 as fallback
+  }
 };
 
 const verifyPassword = async (password, hash) => {
