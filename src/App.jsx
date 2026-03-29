@@ -32,8 +32,157 @@ const sClr = (val, ideal) => {
   return (n < ideal[0] - r * 0.3 || n > ideal[1] + r * 0.3) ? '#ef4444' : '#f59e0b';
 };
 
+const IntroScreen = ({ onStart }) => {
+  return (
+    <div style={{
+      backgroundColor: '#020617',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      textAlign: 'center',
+      overflow: 'hidden'
+    }}>
+      {/* Animated background elements */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <div style={{
+          position: 'absolute',
+          width: '300px',
+          height: '300px',
+          backgroundColor: '#06b6d415',
+          borderRadius: '50%',
+          top: '-100px',
+          left: '-100px',
+          animation: 'float 6s ease-in-out infinite'
+        }} />
+        <div style={{
+          position: 'absolute',
+          width: '200px',
+          height: '200px',
+          backgroundColor: '#0ea5e915',
+          borderRadius: '50%',
+          bottom: '50px',
+          right: '-50px',
+          animation: 'float 8s ease-in-out infinite'
+        }} />
+      </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(30px); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+      `}</style>
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{
+          fontSize: '80px',
+          marginBottom: '20px',
+          animation: 'pulse 2s ease-in-out infinite'
+        }}>
+          🐠
+        </div>
+        
+        <h1 style={{
+          color: '#06b6d4',
+          fontSize: '48px',
+          fontWeight: 'bold',
+          margin: '20px 0',
+          letterSpacing: '2px'
+        }}>
+          ReefPulse
+        </h1>
+        
+        <p style={{
+          color: '#94a3b8',
+          fontSize: '16px',
+          marginBottom: '30px',
+          letterSpacing: '3px',
+          fontWeight: '600'
+        }}>
+          REEF AQUARIUM INTELLIGENCE
+        </p>
+
+        <div style={{
+          maxWidth: '500px',
+          margin: '0 auto 40px'
+        }}>
+          <p style={{
+            color: '#cbd5e1',
+            fontSize: '14px',
+            lineHeight: '1.8',
+            marginBottom: '15px'
+          }}>
+            Monitor your reef aquarium with real-time parameter tracking. Track your corals, fish, and equipment all in one place.
+          </p>
+          <p style={{
+            color: '#94a3b8',
+            fontSize: '13px',
+            lineHeight: '1.6'
+          }}>
+            • Real-time water parameter monitoring<br/>
+            • Coral and fish inventory management<br/>
+            • Equipment maintenance tracking<br/>
+            • Offline support & cloud sync
+          </p>
+        </div>
+
+        <button
+          onClick={onStart}
+          style={{
+            padding: '14px 40px',
+            backgroundColor: '#06b6d4',
+            color: '#020617',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#0891b2';
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#06b6d4';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(6, 182, 212, 0.3)';
+          }}
+        >
+          Get Started
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const TermsScreen = ({ onAccept }) => {
   const [scrolled, setScrolled] = useState(false);
+  const scrollRef = React.useRef(null);
+
+  const handleScroll = (e) => {
+    const el = e.target;
+    const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+    setScrolled(isAtBottom);
+  };
 
   return (
     <div style={{
@@ -50,63 +199,87 @@ const TermsScreen = ({ onAccept }) => {
         borderRadius: '12px',
         border: '1px solid #1e293b',
         width: '100%',
-        maxWidth: '600px',
+        maxWidth: '700px',
         maxHeight: '90vh',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        boxShadow: '0 20px 25px rgba(0, 0, 0, 0.5)'
       }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #1e293b' }}>
-          <h2 style={{ color: '#06b6d4', margin: 0, fontSize: '18px' }}>Terms & Conditions</h2>
+        <div style={{ padding: '25px', borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a' }}>
+          <h2 style={{ color: '#06b6d4', margin: 0, fontSize: '20px', fontWeight: 'bold' }}>Terms & Conditions</h2>
+          <p style={{ color: '#64748b', margin: '8px 0 0 0', fontSize: '12px' }}>Please read and accept to continue</p>
         </div>
 
         <div
-          onScroll={(e) => {
-            const el = e.target;
-            const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 50;
-            setScrolled(atBottom);
-          }}
+          ref={scrollRef}
+          onScroll={handleScroll}
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '20px',
-            color: '#94a3b8',
-            fontSize: '13px',
-            lineHeight: '1.6'
+            padding: '30px',
+            color: '#cbd5e1',
+            fontSize: '14px',
+            lineHeight: '1.8'
           }}
         >
-          <p><strong style={{ color: '#06b6d4' }}>ReefPulse Terms & Conditions</strong></p>
-          <p>By using ReefPulse, you agree to the following terms:</p>
-          
-          <p><strong style={{ color: '#06b6d4' }}>1. Data Privacy</strong><br/>Your data is stored locally in your browser. No data is sent to external servers.</p>
-          
-          <p><strong style={{ color: '#06b6d4' }}>2. Accuracy</strong><br/>ReefPulse provides monitoring tools. Always verify parameters with physical tests.</p>
-          
-          <p><strong style={{ color: '#06b6d4' }}>3. Liability</strong><br/>ReefPulse is provided "as is". The developer is not responsible for aquarium damage or livestock loss.</p>
-          
-          <p><strong style={{ color: '#06b6d4' }}>4. Offline Use</strong><br/>ReefPulse works offline. Features sync when connectivity returns.</p>
-          
-          <p><strong style={{ color: '#06b6d4' }}>5. Account</strong><br/>User is responsible for maintaining account security and password confidentiality.</p>
-          
-          <p style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #1e293b' }}>By clicking "I Accept", you agree to these terms and conditions.</p>
+          <h3 style={{ color: '#06b6d4', marginTop: 0 }}>1. Service Description</h3>
+          <p>ReefPulse is a reef aquarium monitoring and management application designed to help aquarium enthusiasts track water parameters, manage livestock, and maintain equipment schedules.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>2. Data Privacy & Storage</h3>
+          <p>All your data is stored locally in your browser using local storage. We do not transmit, store, or process any of your personal data on external servers. Your aquarium information, parameter readings, and livestock inventory remain entirely under your control on your device.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>3. Accuracy & Liability Disclaimer</h3>
+          <p>ReefPulse provides monitoring tools and suggestions based on entered data. However, parameter readings should ALWAYS be verified with physical testing equipment. The application should be used as a supplementary tool, not as a replacement for proper aquarium testing procedures. Users are solely responsible for maintaining their aquariums.</p>
+          <p>The developer assumes NO LIABILITY for aquarium damage, livestock loss, or financial damages resulting from use of ReefPulse.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>4. Offline Functionality</h3>
+          <p>ReefPulse works completely offline. All data syncing happens locally on your device. An internet connection is not required for basic functionality.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>5. Equipment & Browser Support</h3>
+          <p>ReefPulse is compatible with modern browsers on iOS, Android, and desktop devices. Device storage limitations may apply to historical data retention.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>6. User Responsibilities</h3>
+          <p>Users are responsible for the accuracy of data entered into ReefPulse. Users must maintain appropriate backups of important aquarium records if needed. The application is provided "as is" without warranties of any kind.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>7. Modifications</h3>
+          <p>ReefPulse may be updated or discontinued at any time. Features and functionality may change without notice.</p>
+
+          <h3 style={{ color: '#06b6d4' }}>8. Agreement</h3>
+          <p>By clicking "I Accept", you acknowledge that you have read and understood these terms and conditions, and you agree to use ReefPulse in accordance with them.</p>
+
+          <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #1e293b', color: '#94a3b8', fontSize: '12px', textAlign: 'center' }}>
+            {scrolled ? '✓ Ready to accept' : '↓ Scroll to see all terms'}
+          </div>
         </div>
 
-        <div style={{ padding: '20px', borderTop: '1px solid #1e293b' }}>
+        <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#0f172a' }}>
           <button
             onClick={onAccept}
             disabled={!scrolled}
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '14px',
               backgroundColor: scrolled ? '#06b6d4' : '#475569',
               color: scrolled ? '#020617' : '#9ca3af',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '8px',
               cursor: scrolled ? 'pointer' : 'not-allowed',
               fontWeight: 'bold',
-              fontSize: '14px'
+              fontSize: '15px',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={(e) => {
+              if (scrolled) {
+                e.target.style.backgroundColor = '#0891b2';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (scrolled) {
+                e.target.style.backgroundColor = '#06b6d4';
+              }
             }}
           >
-            {scrolled ? 'I Accept' : 'Scroll to accept'}
+            {scrolled ? 'I Accept Terms & Conditions' : 'Scroll to bottom to accept'}
           </button>
         </div>
       </div>
@@ -223,7 +396,7 @@ const Dashboard = () => {
 };
 
 export default function App() {
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [screen, setScreen] = useState('intro'); // 'intro' | 'terms' | 'dashboard'
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -233,9 +406,14 @@ export default function App() {
   const initApp = async () => {
     try {
       const accepted = await storage.getItem('terms_accepted');
-      setTermsAccepted(accepted === 'true');
+      if (accepted === 'true') {
+        setScreen('dashboard');
+      } else {
+        setScreen('intro');
+      }
     } catch (err) {
       console.error('Init error:', err);
+      setScreen('intro');
     } finally {
       setLoading(false);
     }
@@ -245,9 +423,11 @@ export default function App() {
     <div style={{ color: '#06b6d4', fontSize: '18px' }}>🐠 Loading...</div>
   </div>;
 
-  if (!termsAccepted) return <TermsScreen onAccept={async () => {
+  if (screen === 'intro') return <IntroScreen onStart={() => setScreen('terms')} />;
+  
+  if (screen === 'terms') return <TermsScreen onAccept={async () => {
     await storage.setItem('terms_accepted', 'true');
-    setTermsAccepted(true);
+    setScreen('dashboard');
   }} />;
 
   return <Dashboard />;
