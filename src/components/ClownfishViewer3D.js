@@ -8,7 +8,8 @@
  * - Drag to rotate 360° in any direction
  * - Bevel on all fins for rounded edges
  * 
- * Status: WIP — shape + fins done, next: colors/stripes/texture
+ * Status: WIP — stripes measured from photo, eye positions accurate
+ * Next: natural swimming animation like giphy reference
  */
 
 import React, { useEffect, useRef } from 'react';
