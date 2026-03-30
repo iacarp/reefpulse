@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { I18nProvider, useI18n } from './src/utils/i18n';
 import { getDatabase } from './src/utils/database';
 import { requestNotificationPermissions } from './src/utils/notifications';
-import SplashScreen from './src/components/SplashScreen';
+import ClownfishSplash from './src/components/ClownfishSplash';
 import OfflineBar from './src/components/OfflineBar';
 
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -72,7 +72,7 @@ function AppContent() {
   }, []);
 
   if (showSplash) {
-    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+    return <ClownfishSplash onFinish={() => setShowSplash(false)} />;
   }
 
   return (

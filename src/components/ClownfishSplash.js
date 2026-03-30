@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform, Animated } from 'react-native';
 
 const { width: W, height: H } = Dimensions.get('window');
 
 export default function ClownfishSplash({ onFinish }) {
   const canvasRef = useRef(null);
+  const uiOpacity = useRef(new Animated.Value(0)).current;
+  const ring1Scale = useRef(new Animated.Value(1)).current;
+  const ring2Scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
@@ -357,8 +360,22 @@ export default function ClownfishSplash({ onFinish }) {
     }
     frame();
 
-    // auto-finish after 4s if onFinish provided
-    const timer = onFinish ? setTimeout(onFinish, 4000) : null;
+    // fade in UI after 600ms
+    setTimeout(() => {
+      Animated.timing(uiOpacity, { toValue: 1, duration: 700, useNativeDriver: true }).start();
+    }, 600);
+
+    // pulse rings
+    Animated.loop(Animated.sequence([
+      Animated.timing(ring1Scale, { toValue: 1.06, duration: 1300, useNativeDriver: true }),
+      Animated.timing(ring1Scale, { toValue: 1.0,  duration: 1300, useNativeDriver: true }),
+    ])).start();
+    Animated.loop(Animated.sequence([
+      Animated.timing(ring2Scale, { toValue: 1.06, duration: 1300, delay: 400, useNativeDriver: true }),
+      Animated.timing(ring2Scale, { toValue: 1.0,  duration: 1300, useNativeDriver: true }),
+    ])).start();
+
+
     return () => {
       cancelAnimationFrame(animId);
       if (timer) clearTimeout(timer);
@@ -369,12 +386,37 @@ export default function ClownfishSplash({ onFinish }) {
 
   return (
     <View style={styles.container}>
+      {/* Canvas — fish + ocean */}
       <canvas
         ref={canvasRef}
         width={W}
         height={H}
-        style={{ width: W, height: H }}
+        style={{ position: 'absolute', top: 0, left: 0, width: W, height: H }}
       />
+
+      {/* UI Overlay — centered logo + text */}
+      <Animated.View style={[styles.overlay, { opacity: uiOpacity }]}>
+        {/* Logo ring */}
+        <View style={styles.logoWrap}>
+          <Animated.View style={[styles.ring2, { transform: [{ scale: ring1Scale }] }]} />
+          <Animated.View style={[styles.ring3, { transform: [{ scale: ring2Scale }] }]} />
+          <Text style={styles.logoIcon}>🪸</Text>
+        </View>
+
+        {/* Brand */}
+        <Text style={styles.brand}>ReefPulse</Text>
+        <Text style={styles.sub}>REEF INTELLIGENCE</Text>
+        <View style={styles.divider} />
+        <Text style={styles.tagline}>Track · Diagnose · Thrive</Text>
+      </Animated.View>
+
+      {/* Hint */}
+      <Animated.View style={[styles.hintWrap, { opacity: uiOpacity }]}>
+        <Text style={styles.hint}>tap the fish</Text>
+      </Animated.View>
+
+      {/* Tap anywhere to continue */}
+      <TouchableOpacity style={styles.tapZone} activeOpacity={1} onPress={onFinish} />
     </View>
   );
 }
@@ -384,5 +426,84 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
     zIndex: 999,
+    backgroundColor: '#020c1a',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    pointerEvents: 'none',
+  },
+  logoWrap: {
+    width: 76, height: 76,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: 'rgba(6,182,212,0.45)',
+    backgroundColor: 'rgba(6,182,212,0.09)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  ring2: {
+    position: 'absolute',
+    width: 94, height: 94,
+    borderRadius: 31,
+    borderWidth: 1,
+    borderColor: 'rgba(6,182,212,0.18)',
+  },
+  ring3: {
+    position: 'absolute',
+    width: 112, height: 112,
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(6,182,212,0.08)',
+  },
+  logoIcon: {
+    fontSize: 34,
+  },
+  brand: {
+    fontSize: 38,
+    fontWeight: '800',
+    color: '#06b6d4',
+    letterSpacing: 3,
+    textShadowColor: 'rgba(6,182,212,0.45)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
+  },
+  sub: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: 'rgba(148,163,184,0.65)',
+    letterSpacing: 6,
+    marginTop: 6,
+  },
+  divider: {
+    width: 44,
+    height: 1.5,
+    backgroundColor: 'rgba(6,182,212,0.4)',
+    borderRadius: 1,
+    marginVertical: 13,
+  },
+  tagline: {
+    fontSize: 13,
+    color: 'rgba(203,213,225,0.6)',
+    letterSpacing: 1.5,
+  },
+  hintWrap: {
+    position: 'absolute',
+    bottom: 36,
+    left: 0, right: 0,
+    alignItems: 'center',
+    pointerEvents: 'none',
+  },
+  hint: {
+    fontSize: 11,
+    color: 'rgba(100,150,170,0.45)',
+    letterSpacing: 1.5,
+  },
+  tapZone: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
   },
 });
