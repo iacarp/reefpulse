@@ -1,0 +1,18 @@
+{
+  "name": "ReefPulse - Reef Aquarium Intelligence",
+  "short_name": "ReefPulse",
+  "description": "Monitor your reef aquarium with real-time parameter tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#06b6d4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23020617' width='192' height='192'/><text x='96' y='120' font-size='100' text-anchor='middle' fill='%2306b6d4' font-family='system-ui' dominant-baseline='middle'>🐠</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
