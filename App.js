@@ -8,6 +8,7 @@ import { getDatabase } from './src/utils/database';
 import { requestNotificationPermissions } from './src/utils/notifications';
 import ClownfishSplash from './src/components/ClownfishSplash';
 import OfflineBar from './src/components/OfflineBar';
+import OceanBackground from './src/components/OceanBackground';
 
 import DashboardScreen from './src/screens/DashboardScreen';
 import ParametersScreen from './src/screens/ParametersScreen';
@@ -76,7 +77,8 @@ function AppContent() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#020617' }}>
+    <View style={{ flex: 1, backgroundColor: '#020c1a' }}>
+      <OceanBackground />
       <OfflineBar />
       <NavigationContainer>
         <StatusBar style="light" />

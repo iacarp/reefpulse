@@ -56,7 +56,7 @@ export default function EquipmentScreen({ navigation }) {
   ];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 12 }}>⚙️ {t.eqMaintenance}</Text>
 
       {/* Sub-tabs TOP */}
