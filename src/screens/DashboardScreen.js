@@ -37,7 +37,7 @@ export default function DashboardScreen({ navigation }) {
   const warns = diags.filter(d => d.level === 'warning');
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}
+    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#06b6d4" />}>
 
       {/* Language Modal */}

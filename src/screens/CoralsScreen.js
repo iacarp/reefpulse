@@ -34,7 +34,7 @@ export default function CoralsScreen({ navigation }) {
     if (!c) { setSel(null); return null; }
     const owned = myCorals.includes(c.id), tc = TC[c.type] || '#64748b';
     return (
-      <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
         <TouchableOpacity onPress={() => setSel(null)}><Text style={{ color: '#06b6d4', fontSize: 14, marginBottom: 12 }}>{t.back}</Text></TouchableOpacity>
         <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: `${tc}40` }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
@@ -83,7 +83,7 @@ export default function CoralsScreen({ navigation }) {
   const subs = [...new Set(filtered.map(c => c.sub))];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 4 }}>🪸 {t.coralDatabase}</Text>
       <Text style={{ color: '#64748b', fontSize: 12, marginBottom: 12 }}>{CORAL_DATABASE.length} {t.speciesWithGuide}</Text>
       <View style={{ flexDirection: 'row', gap: 6, marginBottom: 16 }}>
