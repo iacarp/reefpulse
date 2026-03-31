@@ -8,10 +8,10 @@ import { checkFishConflicts, checkCoralConflicts, getRecommendations } from '../
 import { useI18n } from '../utils/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LivestockScreen({ navigation }) {
+export default function LivestockScreen({ navigation, route }) {
   const { t, lang } = useI18n();
   const DISEASES = getDiseases(lang);
-  const [tab, setTab] = useState('my');
+  const [tab, setTab] = useState(route?.params?.initialTab || 'my');
   const [myFish, setMyFish] = useState([]);
   const [myInverts, setMyInverts] = useState([]);
   const [myQty, setMyQty] = useState({});

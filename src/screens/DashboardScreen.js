@@ -25,7 +25,10 @@ export default function DashboardScreen({ navigation }) {
     const c = livestock.filter(l => l.type === 'coral').map(l => l.ref_id);
     const f = livestock.filter(l => l.type === 'fish').map(l => l.ref_id);
     const i = livestock.filter(l => l.type === 'invert').map(l => l.ref_id);
-    setEntries(ent); setLs({ corals: c, fish: f, inverts: i });
+    const fishCount   = livestock.filter(l => l.type === 'fish').reduce((s,l) => s + (l.qty||1), 0);
+    const invertCount = livestock.filter(l => l.type === 'invert').reduce((s,l) => s + (l.qty||1), 0);
+    const coralCount  = livestock.filter(l => l.type === 'coral').reduce((s,l) => s + (l.qty||1), 0);
+    setEntries(ent); setLs({ corals: c, fish: f, inverts: i, fishCount, invertCount, coralCount });
     setDiags(runDiagnostics(ent, CORE_PARAMS, c, f, i, CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE));
   };
 
@@ -131,44 +134,32 @@ export default function DashboardScreen({ navigation }) {
       <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1e293b', marginBottom: 12 }}>
         <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>🐠 {t.myAquarium}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-          {[['🪸', ls.corals.length, t.coralsLabel], ['🐟', ls.fish.length, t.fishLabel], ['🦐', ls.inverts.length, t.invertsLabel], ['📋', entries.length, t.testsLabel]].map(([ic, val, label]) => (
-            <View key={label} style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 22 }}>{ic}</Text>
-              <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{val}</Text>
-              <Text style={{ color: '#64748b', fontSize: 10 }}>{label}</Text>
-            </View>
-          ))}
+          <TouchableOpacity onPress={() => navigation.navigate('Aquarium', { screen: 'Aquarium', params: { tab: 'compat' } })}
+            style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium')}>
+            <Text style={{ fontSize: 22 }}>🪸</Text>
+            <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.coralCount ?? ls.corals.length}</Text>
+            <Text style={{ color: '#64748b', fontSize: 10 }}>{t.coralsLabel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish' })}>
+            <Text style={{ fontSize: 22 }}>🐟</Text>
+            <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.fishCount ?? ls.fish.length}</Text>
+            <Text style={{ color: '#64748b', fontSize: 10 }}>{t.fishLabel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts' })}>
+            <Text style={{ fontSize: 22 }}>🦐</Text>
+            <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.invertCount ?? ls.inverts.length}</Text>
+            <Text style={{ color: '#64748b', fontSize: 10 }}>{t.invertsLabel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Params')}>
+            <Text style={{ fontSize: 22 }}>📋</Text>
+            <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{entries.length}</Text>
+            <Text style={{ color: '#64748b', fontSize: 10 }}>{t.testsLabel}</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Alk Trend */}
-      {entries.length >= 2 && (
-        <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1e293b' }}>
-          <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>📈 {t.alkTrend}</Text>
-          <MiniChart entries={entries} paramKey="alk" param={CORE_PARAMS.alk} />
-        </View>
-      )}
+
     </ScrollView>
   );
 }
 
-function MiniChart({ entries, paramKey, param }) {
-  const data = entries.slice(-10).map(e => ({ d: e.date, v: parseFloat(e[paramKey]) })).filter(d => !isNaN(d.v));
-  if (data.length < 2) return null;
-  const vs = data.map(d => d.v), mn = Math.min(...vs, param.ideal[0]) * 0.95, mx = Math.max(...vs, param.ideal[1]) * 1.05;
-  const cW = W - 64, cH = 80;
-  const sx = (i) => (i / (data.length - 1)) * cW, sy = (v) => cH - ((v - mn) / (mx - mn)) * cH;
-  return (
-    <View style={{ height: cH + 20 }}>
-      <View style={{ position: 'absolute', left: 0, right: 0, top: sy(param.ideal[1]), height: Math.max(0, sy(param.ideal[0]) - sy(param.ideal[1])), backgroundColor: '#10b98115', borderRadius: 4 }} />
-      {data.map((d, i) => {
-        const color = sClr(d.v, param.ideal);
-        return (<View key={i} style={{ position: 'absolute', left: sx(i) - 4, top: sy(d.v) - 4, width: 8, height: 8, borderRadius: 4, backgroundColor: color, borderWidth: 2, borderColor: '#0f172a' }} />);
-      })}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ color: '#64748b', fontSize: 9 }}>{fmt(data[0].d)}</Text>
-        <Text style={{ color: '#64748b', fontSize: 9 }}>{fmt(data[data.length - 1].d)}</Text>
-      </View>
-    </View>
-  );
-}
