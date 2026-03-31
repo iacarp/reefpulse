@@ -319,68 +319,264 @@ export const QT_PROTOCOLS = {
 // ============================================================
 // COMMON FISH DISEASES REFERENCE
 // ============================================================
-export const DISEASES = {
-  ich: {
-    name: "Marine Ich (Cryptocaryon irritans)",
-    aka: "White Spot Disease",
-    symptoms: "Small white dots (like salt grains) on body and fins. Fish flashing/scratching against rocks. Increased breathing rate.",
-    cause: "Parasitic protozoan. Lifecycle: on fish → falls off → reproduces on substrate → free-swimming stage reinfects fish. 28-day cycle.",
-    treatment: "Copper Power at 2.0-2.5 ppm for 14+ days. Tank Transfer Method (TTM) as alternative. Hyposalinity (1.009 sg) also works but stressful.",
-    prevention: "Quarantine ALL new fish. Once in display, Ich is nearly impossible to eradicate without removing all fish for 76-day fallow period.",
-    severity: "Moderate — treatable if caught early. Fatal if untreated.",
-    image: "disease_ich"
+const DISEASES_I18N = {
+  en: {
+    ich: {
+      name: "Marine Ich (Cryptocaryon irritans)", aka: "White Spot Disease",
+      symptoms: "Small white dots (like salt grains) on body and fins. Fish flashing/scratching against rocks. Increased breathing rate.",
+      cause: "Parasitic protozoan. Lifecycle: on fish → falls off → reproduces on substrate → free-swimming stage reinfects fish. 28-day cycle.",
+      treatment: "Copper Power at 2.0-2.5 ppm for 14+ days. Tank Transfer Method (TTM) as alternative. Hyposalinity (1.009 sg) also works but stressful.",
+      prevention: "Quarantine ALL new fish. Once in display, Ich is nearly impossible to eradicate without removing all fish for 76-day fallow period.",
+      severity: "Moderate — treatable if caught early. Fatal if untreated.", image: "disease_ich"
+    },
+    velvet: {
+      name: "Marine Velvet (Amyloodinium ocellatum)", aka: "Velvet Disease, Gold Dust Disease",
+      symptoms: "Fine gold/rust dust coating on body (much finer than Ich). Rapid breathing. Lethargy. Clamped fins. Often kills within 24-48 hours.",
+      cause: "Parasitic dinoflagellate. Much more aggressive and deadly than Ich. Similar lifecycle but faster.",
+      treatment: "Copper Power at 2.5 ppm IMMEDIATELY. Chloroquine Phosphate as alternative. Speed is critical — velvet kills fast.",
+      prevention: "Quarantine is the ONLY reliable prevention. Even more critical than for Ich.",
+      severity: "CRITICAL — can kill entire tank in 48 hours. Emergency treatment required.", image: "disease_velvet"
+    },
+    brooklynella: {
+      name: "Brooklynella (Brooklynella hostilis)", aka: "Clownfish Disease",
+      symptoms: "White mucous/slime coating on body. Looks like cobwebs. Clamped fins. Labored breathing. Rapid decline.",
+      cause: "Parasitic ciliate. Common in wild-caught clownfish. Lives on skin only — no substrate stage.",
+      treatment: "37% Formalin bath (35 min in separate container). NOT responsive to copper. Repeat every 3 days during QT.",
+      prevention: "Buy tank-bred clownfish. Quarantine with Formalin dip protocol.",
+      severity: "HIGH — fast-moving. Once symptoms visible, prognosis is poor without immediate treatment.", image: "disease_brooklynella"
+    },
+    uronema: {
+      name: "Uronema marinum", aka: "Uronema",
+      symptoms: "Red sores/lesions on body. Loss of scales. White patches. Can internalize and affect organs. Often appears in stressed or injured fish.",
+      cause: "Parasitic ciliate. Opportunistic — attacks stressed, injured, or immunocompromised fish.",
+      treatment: "Formalin bath for external. Metronidazole (Metroplex) in food for internal. Rally Pro in QT water (experimental).",
+      prevention: "Minimize stress. Quarantine. Proper nutrition. Clean water.",
+      severity: "HIGH — can be fatal especially when internalized.", image: "disease_uronema"
+    },
+    flukes: {
+      name: "Flukes (Monogenean Trematodes)", aka: "Gill Flukes, Skin Flukes",
+      symptoms: "Flashing/scratching. Rapid breathing (gill flukes). Excess slime production. Cloudy eyes. Often no visible external signs.",
+      cause: "Parasitic flatworms on gills, skin, or mouth. Extremely common on wild-caught fish.",
+      treatment: "PraziPro for 7 days. Repeat treatment after 7-day break. Never mix with Formalin or Copper simultaneously.",
+      prevention: "Quarantine with PraziPro treatment (Phase 3 of 80/20 protocol).",
+      severity: "Low-Moderate — rarely fatal alone but causes stress and secondary infections.", image: "disease_flukes"
+    },
+    hlle: {
+      name: "HLLE (Head and Lateral Line Erosion)", aka: "Hole in the Head",
+      symptoms: "Pitting/erosion along lateral line and head. Usually starts as small holes that get larger. Common in tangs and angelfish.",
+      cause: "Not fully understood. Linked to: poor nutrition, stray electrical voltage in water, activated carbon use, poor water quality.",
+      treatment: "Improve diet (soak food in Selcon/vitamins). Remove activated carbon. Check for stray voltage. Improve water quality.",
+      prevention: "Varied, vitamin-rich diet. Regular nori/seaweed for tangs. Quality frozen foods.",
+      severity: "Low — cosmetic but indicates husbandry issues. Reversible with proper care.", image: "disease_hlle"
+    },
   },
-  velvet: {
-    name: "Marine Velvet (Amyloodinium ocellatum)",
-    aka: "Velvet Disease, Gold Dust Disease",
-    symptoms: "Fine gold/rust dust coating on body (much finer than Ich). Rapid breathing. Lethargy. Clamped fins. Often kills within 24-48 hours of visible symptoms.",
-    cause: "Parasitic dinoflagellate. Much more aggressive and deadly than Ich. Similar lifecycle but faster.",
-    treatment: "Copper Power at 2.5 ppm IMMEDIATELY. Chloroquine Phosphate as alternative. Speed is critical — velvet kills fast.",
-    prevention: "Quarantine is the ONLY reliable prevention. Even more critical than for Ich.",
-    severity: "CRITICAL — can kill entire tank in 48 hours. Emergency treatment required.",
-    image: "disease_velvet"
+  ro: {
+    ich: {
+      name: "Ich Marin (Cryptocaryon irritans)", aka: "Boala Punctelor Albe",
+      symptoms: "Puncte albe mici (ca granule de sare) pe corp și înotătoare. Peștele se freacă de roci. Respirație accelerată.",
+      cause: "Protozoar parazit. Ciclu de viață: pe pește → cade → se reproduce pe substrat → stadiu liber reinfectează peștele. Ciclu de 28 de zile.",
+      treatment: "Copper Power la 2.0-2.5 ppm timp de 14+ zile. Metoda Transfer Tank (TTM) ca alternativă. Hiposalinitatea (1.009) funcționează dar e stresantă.",
+      prevention: "Carantinați TOȚI peștii noi. Odată în acvariu, Ich-ul e aproape imposibil de eradicat fără a scoate toți peștii 76 de zile.",
+      severity: "Moderat — tratabil dacă e prins devreme. Fatal dacă e lăsat netrat.", image: "disease_ich"
+    },
+    velvet: {
+      name: "Catifea Marină (Amyloodinium ocellatum)", aka: "Boala Catifelei, Boala Prafului de Aur",
+      symptoms: "Strat fin auriu/ruginiu pe corp (mult mai fin decât Ich). Respirație rapidă. Letargie. Înotătoare lipite. Ucide adesea în 24-48 ore.",
+      cause: "Dinoflagelat parazit. Mult mai agresiv și mai letal decât Ich-ul. Ciclu similar dar mai rapid.",
+      treatment: "Copper Power la 2.5 ppm IMEDIAT. Fosfat de Clorochină ca alternativă. Viteza e critică — catifeaua ucide rapid.",
+      prevention: "Carantina este SINGURA prevenție sigură. Chiar mai critică decât pentru Ich.",
+      severity: "CRITIC — poate ucide întregul acvariu în 48 ore. Tratament de urgență necesar.", image: "disease_velvet"
+    },
+    brooklynella: {
+      name: "Brooklynella (Brooklynella hostilis)", aka: "Boala Peștilor Clovn",
+      symptoms: "Strat alb mucos/cleios pe corp. Arată ca pânze de păianjen. Înotătoare lipite. Respirație dificilă. Declin rapid.",
+      cause: "Ciliat parazit. Comun la peștii clovn capturați din sălbăticie. Trăiește doar pe piele — fără stadiu pe substrat.",
+      treatment: "Baie cu Formalin 37% (35 min în recipient separat). NU răspunde la cupru. Repetați la fiecare 3 zile în carantină.",
+      prevention: "Cumpărați pești clovn crescuți în captivitate. Carantinați cu protocol de baie în Formalin.",
+      severity: "RIDICAT — progresează rapid. Odată vizibile simptomele, prognosticul e slab fără tratament imediat.", image: "disease_brooklynella"
+    },
+    uronema: {
+      name: "Uronema marinum", aka: "Uronema",
+      symptoms: "Răni/leziuni roșii pe corp. Pierdere de solzi. Pete albe. Poate afecta organele interne. Apare adesea la pești stresați sau răniți.",
+      cause: "Ciliat parazit oportunist — atacă peștii stresați, răniți sau cu sistem imunitar slăbit.",
+      treatment: "Baie cu Formalin pentru extern. Metronidazol (Metroplex) în hrană pentru intern. Rally Pro în apa de carantină (experimental).",
+      prevention: "Minimizați stresul. Carantinați. Nutriție adecvată. Apă curată.",
+      severity: "RIDICAT — poate fi fatal mai ales când e internalizat.", image: "disease_uronema"
+    },
+    flukes: {
+      name: "Flukes (Trematode Monogenice)", aka: "Flukes Branhiale, Flukes Cutanate",
+      symptoms: "Frecare/zgâriere. Respirație rapidă (flukes branhiale). Producție excesivă de mucus. Ochi tulburi. Adesea fără semne externe vizibile.",
+      cause: "Viermi plaţi paraziți pe branhii, piele sau gură. Extrem de comuni la peștii capturați din sălbăticie.",
+      treatment: "PraziPro timp de 7 zile. Repetați după o pauză de 7 zile. Nu combinați cu Formalin sau Cupru simultan.",
+      prevention: "Carantinați cu tratament PraziPro (Faza 3 a protocolului 80/20).",
+      severity: "Scăzut-Moderat — rareori fatal singur, dar cauzează stres și infecții secundare.", image: "disease_flukes"
+    },
+    hlle: {
+      name: "HLLE (Eroziunea Capului și Liniei Laterale)", aka: "Gaură în Cap",
+      symptoms: "Gropiți/eroziune de-a lungul liniei laterale și capului. Începe cu găuri mici care se măresc. Comun la tangi și pești-înger.",
+      cause: "Nu e pe deplin înțeles. Legat de: nutriție slabă, tensiune electrică vagabondă în apă, utilizarea cărbunelui activ, calitate slabă a apei.",
+      treatment: "Îmbunătățiți dieta (înmuiați hrana în Selcon/vitamine). Eliminați cărbunele activ. Verificați tensiunea vagabondă. Îmbunătățiți calitatea apei.",
+      prevention: "Dietă variată, bogată în vitamine. Nori/alge regulate pentru tangi. Hrană congelată de calitate.",
+      severity: "Scăzut — cosmetic dar indică probleme de îngrijire. Reversibil cu îngrijire adecvată.", image: "disease_hlle"
+    },
   },
-  brooklynella: {
-    name: "Brooklynella (Brooklynella hostilis)",
-    aka: "Clownfish Disease",
-    symptoms: "White mucous/slime coating on body. Looks like cobwebs. Clamped fins. Labored breathing. Rapid decline.",
-    cause: "Parasitic ciliate. Common in wild-caught clownfish. Lives on skin only — no substrate stage.",
-    treatment: "37% Formalin bath (35 min in separate container). NOT responsive to copper. Repeat every 3 days during QT.",
-    prevention: "Buy tank-bred clownfish. Quarantine with Formalin dip protocol.",
-    severity: "HIGH — fast-moving. Once symptoms visible, prognosis is poor without immediate treatment.",
-    image: "disease_brooklynella"
+  fr: {
+    ich: {
+      name: "Ich Marin (Cryptocaryon irritans)", aka: "Maladie des Points Blancs",
+      symptoms: "Petits points blancs (comme des grains de sel) sur le corps et les nageoires. Poisson se frottant contre les roches. Respiration accélérée.",
+      cause: "Protozoaire parasite. Cycle de vie : sur le poisson → tombe → se reproduit sur le substrat → stade libre réinfecte le poisson. Cycle de 28 jours.",
+      treatment: "Copper Power à 2.0-2.5 ppm pendant 14+ jours. Méthode de transfert de bac (TTM) en alternative. Hyposalinitée (1.009) fonctionne mais stressant.",
+      prevention: "Quarantaine TOUS les nouveaux poissons. Une fois dans l'aquarium, l'Ich est presque impossible à éradiquer sans retirer tous les poissons 76 jours.",
+      severity: "Modéré — traitable si détecté tôt. Fatal si non traité.", image: "disease_ich"
+    },
+    velvet: {
+      name: "Velours Marin (Amyloodinium ocellatum)", aka: "Maladie du Velours",
+      symptoms: "Fin revêtement doré/rouillé sur le corps. Respiration rapide. Léthargie. Nageoires repliées. Tue souvent en 24-48 heures.",
+      cause: "Dinoflagellé parasite. Beaucoup plus agressif et mortel que l'Ich. Cycle similaire mais plus rapide.",
+      treatment: "Copper Power à 2.5 ppm IMMÉDIATEMENT. Phosphate de Chloroquine en alternative. La rapidité est critique.",
+      prevention: "La quarantaine est la SEULE prévention fiable.",
+      severity: "CRITIQUE — peut tuer tout l'aquarium en 48 heures. Traitement d'urgence requis.", image: "disease_velvet"
+    },
+    brooklynella: {
+      name: "Brooklynella (Brooklynella hostilis)", aka: "Maladie des Poissons Clowns",
+      symptoms: "Revêtement blanc muqueux sur le corps. Ressemble à des toiles d'araignée. Nageoires repliées. Respiration difficile.",
+      cause: "Cilié parasite. Commun chez les poissons clowns sauvages. Vit uniquement sur la peau.",
+      treatment: "Bain de Formaline 37% (35 min). Ne répond PAS au cuivre. Répéter tous les 3 jours en quarantaine.",
+      prevention: "Achetez des poissons clowns d'élevage. Quarantaine avec protocole Formaline.",
+      severity: "ÉLEVÉ — évolue rapidement. Pronostic sombre sans traitement immédiat.", image: "disease_brooklynella"
+    },
+    uronema: {
+      name: "Uronema marinum", aka: "Uronema",
+      symptoms: "Plaies/lésions rouges sur le corps. Perte d'écailles. Taches blanches. Peut affecter les organes internes.",
+      cause: "Cilié parasite opportuniste — attaque les poissons stressés, blessés ou immunodéprimés.",
+      treatment: "Bain de Formaline pour l'externe. Métronidazole (Metroplex) dans la nourriture pour l'interne.",
+      prevention: "Minimiser le stress. Quarantaine. Nutrition adéquate. Eau propre.",
+      severity: "ÉLEVÉ — peut être fatal surtout quand internalisé.", image: "disease_uronema"
+    },
+    flukes: {
+      name: "Flukes (Trématodes Monogènes)", aka: "Flukes Branchiaux",
+      symptoms: "Frottements/grattages. Respiration rapide. Production excessive de mucus. Yeux troubles.",
+      cause: "Vers plats parasites sur les branchies, la peau ou la bouche. Très communs chez les poissons sauvages.",
+      treatment: "PraziPro pendant 7 jours. Répéter après 7 jours de pause.",
+      prevention: "Quarantaine avec traitement PraziPro.",
+      severity: "Faible-Modéré — rarement fatal seul mais cause stress et infections secondaires.", image: "disease_flukes"
+    },
+    hlle: {
+      name: "HLLE (Érosion de la Tête et de la Ligne Latérale)", aka: "Trou dans la Tête",
+      symptoms: "Érosion le long de la ligne latérale et de la tête. Commence par de petits trous qui s'agrandissent.",
+      cause: "Lié à : mauvaise nutrition, tension électrique vagabonde, charbon actif, mauvaise qualité de l'eau.",
+      treatment: "Améliorer l'alimentation. Retirer le charbon actif. Vérifier la tension vagabonde.",
+      prevention: "Alimentation variée riche en vitamines. Algues régulières pour les chirurgiens.",
+      severity: "Faible — cosmétique mais indique des problèmes d'entretien. Réversible.", image: "disease_hlle"
+    },
   },
-  uronema: {
-    name: "Uronema marinum",
-    aka: "Uronema",
-    symptoms: "Red sores/lesions on body. Loss of scales. White patches. Can internalize and affect organs. Often appears in stressed or injured fish.",
-    cause: "Parasitic ciliate. Opportunistic — attacks stressed, injured, or immunocompromised fish.",
-    treatment: "Formalin bath for external. Metronidazole (Metroplex) in food for internal. Rally Pro in QT water (experimental).",
-    prevention: "Minimize stress. Quarantine. Proper nutrition. Clean water.",
-    severity: "HIGH — can be fatal especially when internalized.",
-    image: "disease_uronema"
+  es: {
+    ich: {
+      name: "Ich Marino (Cryptocaryon irritans)", aka: "Enfermedad de los Puntos Blancos",
+      symptoms: "Pequeños puntos blancos (como granos de sal) en cuerpo y aletas. Pez frotándose contra las rocas. Respiración acelerada.",
+      cause: "Protozoo parásito. Ciclo de vida: en el pez → cae → se reproduce en el sustrato → etapa libre reinfecta al pez. Ciclo de 28 días.",
+      treatment: "Copper Power a 2.0-2.5 ppm durante 14+ días. Método de transferencia de tanque (TTM) como alternativa.",
+      prevention: "Cuarentena TODOS los peces nuevos. Una vez en el acuario, el Ich es casi imposible de erradicar.",
+      severity: "Moderado — tratable si se detecta temprano. Fatal si no se trata.", image: "disease_ich"
+    },
+    velvet: {
+      name: "Terciopelo Marino (Amyloodinium ocellatum)", aka: "Enfermedad del Terciopelo",
+      symptoms: "Fino recubrimiento dorado/oxidado en el cuerpo. Respiración rápida. Letargo. Aletas pegadas. Mata en 24-48 horas.",
+      cause: "Dinoflagelado parásito. Mucho más agresivo y mortal que el Ich.",
+      treatment: "Copper Power a 2.5 ppm INMEDIATAMENTE. La velocidad es crítica.",
+      prevention: "La cuarentena es la ÚNICA prevención confiable.",
+      severity: "CRÍTICO — puede matar todo el acuario en 48 horas.", image: "disease_velvet"
+    },
+    brooklynella: {
+      name: "Brooklynella (Brooklynella hostilis)", aka: "Enfermedad del Pez Payaso",
+      symptoms: "Recubrimiento blanco mucoso en el cuerpo. Parece telas de araña. Aletas pegadas. Respiración dificultosa.",
+      cause: "Ciliado parásito. Común en peces payaso salvajes. Vive solo en la piel.",
+      treatment: "Baño de Formalina al 37% (35 min). NO responde al cobre. Repetir cada 3 días en cuarentena.",
+      prevention: "Comprar peces payaso de criadero. Cuarentena con protocolo de Formalina.",
+      severity: "ALTO — avanza rápido. Pronóstico malo sin tratamiento inmediato.", image: "disease_brooklynella"
+    },
+    uronema: {
+      name: "Uronema marinum", aka: "Uronema",
+      symptoms: "Llagas/lesiones rojas en el cuerpo. Pérdida de escamas. Manchas blancas. Puede afectar órganos internos.",
+      cause: "Ciliado parásito oportunista — ataca peces estresados, heridos o inmunocomprometidos.",
+      treatment: "Baño de Formalina para externo. Metronidazol (Metroplex) en comida para interno.",
+      prevention: "Minimizar estrés. Cuarentena. Nutrición adecuada. Agua limpia.",
+      severity: "ALTO — puede ser fatal especialmente cuando se internaliza.", image: "disease_uronema"
+    },
+    flukes: {
+      name: "Flukes (Trematodos Monogénicos)", aka: "Flukes de Branquias",
+      symptoms: "Frotamiento/rascado. Respiración rápida. Exceso de mucosidad. Ojos nublados.",
+      cause: "Gusanos planos parásitos en branquias, piel o boca. Muy comunes en peces salvajes.",
+      treatment: "PraziPro durante 7 días. Repetir después de 7 días de pausa.",
+      prevention: "Cuarentena con tratamiento PraziPro.",
+      severity: "Bajo-Moderado — raramente fatal solo pero causa estrés e infecciones secundarias.", image: "disease_flukes"
+    },
+    hlle: {
+      name: "HLLE (Erosión de Cabeza y Línea Lateral)", aka: "Agujero en la Cabeza",
+      symptoms: "Erosión a lo largo de la línea lateral y la cabeza. Común en tanques y peces ángel.",
+      cause: "Relacionado con: mala nutrición, tensión eléctrica errante, carbón activado, mala calidad del agua.",
+      treatment: "Mejorar dieta. Retirar carbón activado. Verificar tensión errante.",
+      prevention: "Dieta variada rica en vitaminas. Algas regulares para tanques.",
+      severity: "Bajo — cosmético pero indica problemas de mantenimiento. Reversible.", image: "disease_hlle"
+    },
   },
-  flukes: {
-    name: "Flukes (Monogenean Trematodes)",
-    aka: "Gill Flukes, Skin Flukes",
-    symptoms: "Flashing/scratching. Rapid breathing (gill flukes). Excess slime production. Cloudy eyes. Often no visible external signs.",
-    cause: "Parasitic flatworms on gills, skin, or mouth. Extremely common on wild-caught fish.",
-    treatment: "PraziPro for 7 days. Repeat treatment after 7-day break. Never mix with Formalin or Copper simultaneously.",
-    prevention: "Quarantine with PraziPro treatment (Phase 3 of 80/20 protocol).",
-    severity: "Low-Moderate — rarely fatal alone but causes stress and secondary infections.",
-    image: "disease_flukes"
-  },
-  hlle: {
-    name: "HLLE (Head and Lateral Line Erosion)",
-    aka: "Hole in the Head",
-    symptoms: "Pitting/erosion along lateral line and head. Usually starts as small holes that get larger. Common in tangs and angelfish.",
-    cause: "Not fully understood. Linked to: poor nutrition (lack of vitamins), stray electrical voltage in water, activated carbon use, poor water quality.",
-    treatment: "Improve diet (soak food in Selcon/vitamins). Remove activated carbon. Check for stray voltage. Improve water quality.",
-    prevention: "Varied, vitamin-rich diet. Regular nori/seaweed for tangs. Quality frozen foods.",
-    severity: "Low — cosmetic but indicates husbandry issues. Reversible with proper care.",
-    image: "disease_hlle"
+  de: {
+    ich: {
+      name: "Meereis (Cryptocaryon irritans)", aka: "Weißpünktchenkrankheit",
+      symptoms: "Kleine weiße Punkte (wie Salzkörner) auf Körper und Flossen. Fisch reibt sich an Felsen. Erhöhte Atemfrequenz.",
+      cause: "Parasitäres Protozoon. Lebenszyklus: am Fisch → fällt ab → reproduziert sich im Substrat → freischwimmendes Stadium reinfiziert. 28-Tage-Zyklus.",
+      treatment: "Copper Power bei 2.0-2.5 ppm für 14+ Tage. Tank-Transfer-Methode (TTM) als Alternative.",
+      prevention: "ALLE neuen Fische in Quarantäne. Im Hauptbecken ist Ich kaum zu beseitigen ohne 76 Tage fischleer.",
+      severity: "Moderat — behandelbar wenn früh erkannt. Fatal wenn unbehandelt.", image: "disease_ich"
+    },
+    velvet: {
+      name: "Meeressamt (Amyloodinium ocellatum)", aka: "Samtkrankheit",
+      symptoms: "Feiner gold/rostfarbener Belag auf dem Körper. Schnelle Atmung. Lethargie. Eingeklemmte Flossen. Tötet oft in 24-48 Stunden.",
+      cause: "Parasitärer Dinoflagellat. Viel aggressiver und tödlicher als Ich.",
+      treatment: "Copper Power bei 2.5 ppm SOFORT. Chloroquinphosphat als Alternative. Geschwindigkeit ist entscheidend.",
+      prevention: "Quarantäne ist die EINZIGE zuverlässige Prävention.",
+      severity: "KRITISCH — kann das gesamte Becken in 48 Stunden töten.", image: "disease_velvet"
+    },
+    brooklynella: {
+      name: "Brooklynella (Brooklynella hostilis)", aka: "Clownfischkrankheit",
+      symptoms: "Weißer Schleim auf dem Körper. Sieht aus wie Spinnweben. Eingeklemmte Flossen. Schwere Atmung.",
+      cause: "Parasitäres Wimpertier. Häufig bei Wildfang-Clownfischen. Lebt nur auf der Haut.",
+      treatment: "37% Formalin-Bad (35 Min). KEIN Ansprechen auf Kupfer. Alle 3 Tage in Quarantäne wiederholen.",
+      prevention: "Nachzucht-Clownfische kaufen. Quarantäne mit Formalin-Protokoll.",
+      severity: "HOCH — schnell fortschreitend. Schlechte Prognose ohne sofortige Behandlung.", image: "disease_brooklynella"
+    },
+    uronema: {
+      name: "Uronema marinum", aka: "Uronema",
+      symptoms: "Rote Wunden/Läsionen am Körper. Schuppenverlust. Weiße Flecken. Kann Organe befallen.",
+      cause: "Opportunistisches Wimpertier — befällt gestresste, verletzte oder immungeschwächte Fische.",
+      treatment: "Formalin-Bad für externe Behandlung. Metronidazol (Metroplex) im Futter für interne.",
+      prevention: "Stress minimieren. Quarantäne. Gute Ernährung. Sauberes Wasser.",
+      severity: "HOCH — kann besonders bei Internalisierung tödlich sein.", image: "disease_uronema"
+    },
+    flukes: {
+      name: "Flukes (Monogene Trematoden)", aka: "Kiemenwürmer, Hautwürmer",
+      symptoms: "Reiben/Kratzen. Schnelle Atmung. Übermäßige Schleimproduktion. Trübe Augen.",
+      cause: "Parasitäre Plattwürmer an Kiemen, Haut oder Maul. Bei Wildfängen sehr häufig.",
+      treatment: "PraziPro für 7 Tage. Behandlung nach 7 Tagen Pause wiederholen.",
+      prevention: "Quarantäne mit PraziPro-Behandlung.",
+      severity: "Niedrig-Moderat — selten allein tödlich, verursacht aber Stress und Sekundärinfektionen.", image: "disease_flukes"
+    },
+    hlle: {
+      name: "HLLE (Kopf- und Seitenlinienerosion)", aka: "Loch im Kopf",
+      symptoms: "Grubenbildung entlang der Seitenlinie und am Kopf. Häufig bei Doktorfischen und Kaiserfischen.",
+      cause: "Zusammenhang mit: schlechter Ernährung, Streustrom im Wasser, Aktivkohle, schlechter Wasserqualität.",
+      treatment: "Ernährung verbessern. Aktivkohle entfernen. Streustrom prüfen.",
+      prevention: "Abwechslungsreiche, vitaminreiche Ernährung. Regelmäßig Nori für Doktorfische.",
+      severity: "Niedrig — kosmetisch aber zeigt Pflegeprobleme an. Reversibel.", image: "disease_hlle"
+    },
   },
 };
+
+export const DISEASES = DISEASES_I18N.en;
+
+export function getDiseases(lang) {
+  return DISEASES_I18N[lang] || DISEASES_I18N.en;
+}
 
 // ============================================================
 // COMMON REEF EQUIPMENT DATABASE

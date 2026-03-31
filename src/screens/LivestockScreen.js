@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getMyLivestock, addLivestock, removeLivestock } from '../utils/database';
-import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, DISEASES } from '../data/livestock';
+import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, getDiseases } from '../data/livestock';
 import { CORAL_DATABASE } from '../data/corals';
 import { checkFishConflicts, checkCoralConflicts, getRecommendations } from '../data/compatibility';
 import { useI18n } from '../utils/i18n';
@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LivestockScreen({ navigation }) {
   const { t, lang } = useI18n();
+  const DISEASES = getDiseases(lang);
   const [tab, setTab] = useState('my');
   const [myFish, setMyFish] = useState([]);
   const [myInverts, setMyInverts] = useState([]);
