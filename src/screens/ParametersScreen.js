@@ -202,9 +202,9 @@ export default function ParametersScreen({ navigation }) {
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 12 }}>🧪 {t.paramsDash || 'Parameters'}</Text>
 
-      {/* ── SUB-TABS — same pattern as Aquarium ── */}
+      {/* ── SUB-TABS + ADD BUTTON ── */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-        <View style={{ flexDirection: 'row', gap: 4 }}>
+        <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
           {stabs.map(st => (
             <TouchableOpacity key={st.id} onPress={() => { setTab(st.id); setShowAdd(false); }}
               style={{ backgroundColor: tab === st.id ? '#06b6d420' : '#1e293b', borderWidth: 1, borderColor: tab === st.id ? '#06b6d440' : '#334155',
@@ -213,6 +213,11 @@ export default function ParametersScreen({ navigation }) {
               {tab === st.id && <Text style={{ color: '#06b6d4', fontSize: 11, fontWeight: '600' }}>{st.label}</Text>}
             </TouchableOpacity>
           ))}
+          <TouchableOpacity onPress={() => { setTab('history'); setShowAdd(true); }}
+            style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 4 }}>
+            <Text style={{ fontSize: 16 }}>🧪</Text>
+            <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>+ {t.newTest || 'Add Test'}</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -294,15 +299,7 @@ export default function ParametersScreen({ navigation }) {
 
       {/* ══════════ HISTORY ══════════ */}
       {tab === 'history' && (<>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600' }}>{t.paramJournal || 'Parameter Journal'}</Text>
-          <TouchableOpacity onPress={() => setShowAdd(!showAdd)}
-            style={{ backgroundColor: showAdd ? '#dc262620' : '#06b6d4', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
-            <Text style={{ color: showAdd ? '#f87171' : 'white', fontSize: 12, fontWeight: '600' }}>
-              {showAdd ? (t.cancel || '✕') : `+ ${t.newTest || 'New Test'}`}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600', marginBottom: 14 }}>{t.paramJournal || 'Parameter Journal'}</Text>
 
         {showAdd && (
           <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#06b6d430', marginBottom: 16 }}>

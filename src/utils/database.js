@@ -7,8 +7,9 @@ export async function getDatabase() { return true; }
 export async function addEntry(entry) { const e = (await get('entries')) || []; entry.id = Date.now(); e.push(entry); await set('entries', e); return entry.id; }
 export async function getAllEntries() { const e = (await get('entries')) || []; return e.sort((a, b) => new Date(a.date) - new Date(b.date)); }
 export async function deleteEntry(id) { const e = (await get('entries')) || []; await set('entries', e.filter(x => x.id !== id)); }
-export async function addLivestock(refId, type) { const l = (await get('livestock')) || []; l.push({ id: Date.now(), ref_id: refId, type, added_date: new Date().toISOString() }); await set('livestock', l); }
+export async function addLivestock(refId, type) { const l = (await get('livestock')) || []; const ex = l.find(x => x.ref_id === refId && x.type === type); if (ex) { ex.qty = (ex.qty || 1) + 1; } else { l.push({ id: Date.now(), ref_id: refId, type, qty: 1, added_date: new Date().toISOString() }); } await set('livestock', l); }
 export async function removeLivestock(refId, type) { const l = (await get('livestock')) || []; await set('livestock', l.filter(x => !(x.ref_id === refId && x.type === type))); }
+export async function updateLivestockQty(refId, type, qty) { const l = (await get('livestock')) || []; const i = l.findIndex(x => x.ref_id === refId && x.type === type); if (i >= 0) { if (qty <= 0) l.splice(i, 1); else l[i].qty = qty; await set('livestock', l); } }
 export async function getMyLivestock() { return (await get('livestock')) || []; }
 export async function addEquipment(eq) { const l = (await get('equipment')) || []; eq.id = Date.now(); l.push(eq); await set('equipment', l); return eq.id; }
 export async function getMyEquipment() { return (await get('equipment')) || []; }

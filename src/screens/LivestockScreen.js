@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { getMyLivestock, addLivestock, removeLivestock } from '../utils/database';
+import { getMyLivestock, addLivestock, removeLivestock, updateLivestockQty } from '../utils/database';
 import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, getDiseases } from '../data/livestock';
 import { CORAL_DATABASE } from '../data/corals';
 import { checkFishConflicts, checkCoralConflicts, getRecommendations } from '../data/compatibility';
@@ -14,6 +14,7 @@ export default function LivestockScreen({ navigation }) {
   const [tab, setTab] = useState('my');
   const [myFish, setMyFish] = useState([]);
   const [myInverts, setMyInverts] = useState([]);
+  const [myQty, setMyQty] = useState({});
   const [myCorals, setMyCorals] = useState([]);
   const [sel, setSel] = useState(null);
   const [wishlist, setWishlist] = useState([]);
@@ -23,6 +24,9 @@ export default function LivestockScreen({ navigation }) {
     setMyFish(ls.filter(l => l.type === 'fish').map(l => l.ref_id));
     setMyInverts(ls.filter(l => l.type === 'invert').map(l => l.ref_id));
     setMyCorals(ls.filter(l => l.type === 'coral').map(l => l.ref_id));
+    const qtyMap = {};
+    ls.forEach(l => { qtyMap[l.ref_id + '_' + l.type] = l.qty || 1; });
+    setMyQty(qtyMap);
     try { const w = await AsyncStorage.getItem('wishlist'); setWishlist(w ? JSON.parse(w) : []); } catch { setWishlist([]); }
   };
   useFocusEffect(useCallback(() => { load(); }, []));
@@ -163,11 +167,43 @@ export default function LivestockScreen({ navigation }) {
       {tab === 'my' && (<>
         {myFish.length > 0 && <><Text style={S.sec}>{t.myFish}</Text>
           {myFish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
-            return <LI key={id} title={f.name} sub={f.notes} onPress={() => setSel({ type: 'fish', id })} right={<TouchableOpacity onPress={() => toggleFish(id)}><Text style={{ color: '#f87171' }}>✕</Text></TouchableOpacity>} />;
+            const qty = myQty[id + '_fish'] || 1;
+            return (
+              <LI key={id} title={f.name} sub={f.notes} onPress={() => setSel({ type: 'fish', id })}
+                right={
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'fish', qty-1); await load(); }}
+                      style={{ backgroundColor: '#1e293b', borderRadius: 6, width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: qty <= 1 ? '#f87171' : '#94a3b8', fontSize: 16, lineHeight: 20 }}>{qty <= 1 ? '✕' : '−'}</Text>
+                    </TouchableOpacity>
+                    <Text style={{ color: '#e2e8f0', fontSize: 15, fontWeight: '700', minWidth: 18, textAlign: 'center' }}>{qty}</Text>
+                    <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'fish', qty+1); await load(); }}
+                      style={{ backgroundColor: '#1e293b', borderRadius: 6, width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: '#06b6d4', fontSize: 16, lineHeight: 20 }}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                } />
+            );
           })}</>}
         {myInverts.length > 0 && <><Text style={{ ...S.sec, marginTop: 12 }}>{t.myInverts}</Text>
           {myInverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
-            return <LI key={id} title={inv.name} sub={inv.notes} onPress={() => setSel({ type: 'invert', id })} right={<TouchableOpacity onPress={() => toggleInvert(id)}><Text style={{ color: '#f87171' }}>✕</Text></TouchableOpacity>} />;
+            const qty = myQty[id + '_invert'] || 1;
+            return (
+              <LI key={id} title={inv.name} sub={inv.notes} onPress={() => setSel({ type: 'invert', id })}
+                right={
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'invert', qty-1); await load(); }}
+                      style={{ backgroundColor: '#1e293b', borderRadius: 6, width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: qty <= 1 ? '#f87171' : '#94a3b8', fontSize: 16, lineHeight: 20 }}>{qty <= 1 ? '✕' : '−'}</Text>
+                    </TouchableOpacity>
+                    <Text style={{ color: '#e2e8f0', fontSize: 15, fontWeight: '700', minWidth: 18, textAlign: 'center' }}>{qty}</Text>
+                    <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'invert', qty+1); await load(); }}
+                      style={{ backgroundColor: '#1e293b', borderRadius: 6, width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: '#06b6d4', fontSize: 16, lineHeight: 20 }}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                } />
+            );
           })}</>}
         {/* Show conflicts inline on My Tank */}
         {(fishConflicts.length > 0 || coralConflicts.length > 0) && (
