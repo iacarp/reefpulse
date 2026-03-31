@@ -6,6 +6,7 @@ import { CORE_PARAMS, runDiagnostics } from '../data/parameters';
 import { CORAL_DATABASE } from '../data/corals';
 import { FISH_DATABASE, INVERT_DATABASE } from '../data/livestock';
 import { useI18n } from '../utils/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const W = Dimensions.get('window').width;
 const sClr = (val, ideal) => { if (val == null || val === '') return '#64748b'; const n = parseFloat(val); if (isNaN(n)) return '#64748b'; if (n >= ideal[0] && n <= ideal[1]) return '#10b981'; const r = ideal[1] - ideal[0]; return (n < ideal[0] - r * 0.3 || n > ideal[1] + r * 0.3) ? '#ef4444' : '#f59e0b'; };
@@ -18,10 +19,31 @@ export default function DashboardScreen({ navigation }) {
   const [diags, setDiags] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showLang, setShowLang] = useState(false);
+  const [todayTodos, setTodayTodos] = useState([]);
+  const [todayDueEq, setTodayDueEq] = useState([]);
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const load = async () => {
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
+    // Load today's todos
+    try {
+      const td = await AsyncStorage.getItem('todos');
+      const allTodos = td ? JSON.parse(td) : [];
+      setTodayTodos(allTodos.filter(t => !t.done && (!t.date || t.date === todayStr)));
+    } catch {}
+    // Load due equipment
+    try {
+      const eq = await AsyncStorage.getItem('equipment');
+      const allEq = eq ? JSON.parse(eq) : [];
+      const now = new Date();
+      setTodayDueEq(allEq.filter(e => {
+        const last = e.last_maintenance ? new Date(e.last_maintenance) : null;
+        const days = last ? Math.floor((now - last) / 864e5) : 999;
+        return days >= (e.maintenance_schedule_days || 30);
+      }));
+    } catch {}
     const c = livestock.filter(l => l.type === 'coral').map(l => l.ref_id);
     const f = livestock.filter(l => l.type === 'fish').map(l => l.ref_id);
     const i = livestock.filter(l => l.type === 'invert').map(l => l.ref_id);
@@ -159,6 +181,29 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
 
+
+      {/* Today's To Do */}
+      {(todayTodos.length > 0 || todayDueEq.length > 0) && (
+        <TouchableOpacity onPress={() => navigation.navigate('Equipment')}
+          style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#06b6d430', marginTop: 12 }}>
+          <Text style={{ color: '#06b6d4', fontSize: 13, fontWeight: '700', marginBottom: 10 }}>✅ Today's To Do</Text>
+          {todayDueEq.slice(0,3).map(eq => (
+            <View key={eq.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#ef4444' }} />
+              <Text style={{ color: '#fca5a5', fontSize: 13 }}>⚙️ {eq.name} — maintenance due</Text>
+            </View>
+          ))}
+          {todayTodos.slice(0,3).map(td => (
+            <View key={td.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#06b6d4' }} />
+              <Text style={{ color: '#94a3b8', fontSize: 13 }}>{td.text}</Text>
+            </View>
+          ))}
+          {(todayTodos.length + todayDueEq.length) > 3 && (
+            <Text style={{ color: '#475569', fontSize: 11, marginTop: 4 }}>+{todayTodos.length + todayDueEq.length - 3} more → tap to see all</Text>
+          )}
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
