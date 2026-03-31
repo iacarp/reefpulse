@@ -316,7 +316,7 @@ export default function ParametersScreen({ navigation }) {
                 <View key={key} style={{ width: '47%' }}>
                   <Text style={{ color: '#64748b', fontSize: 11, marginBottom: 4 }}>{p.icon} {p.name} ({p.unit})</Text>
                   <TextInput keyboardType="decimal-pad" value={form[key] || ''} placeholder={`${p.ideal[0]}–${p.ideal[1]}`}
-                    placeholderTextColor="#334155" onChangeText={v => setForm({ ...form, [key]: v })} style={IS} />
+                    placeholderTextColor="#334155" onChangeText={v => setForm({ ...form, [key]: v.replace(',', '.') })} style={IS} />
                 </View>
               ))}
             </View>
@@ -327,7 +327,7 @@ export default function ParametersScreen({ navigation }) {
                   return (<View key={k} style={{ width: '47%' }}>
                     <Text style={{ color: '#64748b', fontSize: 11, marginBottom: 4 }}>{ep.icon} {ep.name} ({ep.unit})</Text>
                     <TextInput keyboardType="decimal-pad" value={form[k] || ''} placeholder={`${ep.ideal[0]}–${ep.ideal[1]}`}
-                      placeholderTextColor="#334155" onChangeText={v => setForm({ ...form, [k]: v })} style={IS} />
+                      placeholderTextColor="#334155" onChangeText={v => setForm({ ...form, [k]: v.replace(',', '.') })} style={IS} />
                   </View>);
                 })}
               </View>
