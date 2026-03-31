@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getAllEntries, addEntry, deleteEntry, getActiveExtraParams, toggleExtraParam } from '../utils/database';
 import { CORE_PARAMS, EXTRA_PARAMS } from '../data/parameters';
 import { useI18n } from '../utils/i18n';
+import DosingCalculator from '../components/DosingCalculator';
 
 const sClr = (val, ideal) => { if (val == null || val === '') return '#64748b'; const n = parseFloat(val); if (isNaN(n)) return '#64748b'; if (n >= ideal[0] && n <= ideal[1]) return '#10b981'; const r = ideal[1] - ideal[0]; return (n < ideal[0] - r * 0.3 || n > ideal[1] + r * 0.3) ? '#ef4444' : '#f59e0b'; };
 const fmt = (d) => { try { return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return d; } };
@@ -109,6 +110,9 @@ export default function ParametersScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Dosing Calculator */}
+      <DosingCalculator />
 
       {entries.length === 0 ? (
         <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 30, borderWidth: 1, borderColor: '#1e293b', alignItems: 'center' }}>

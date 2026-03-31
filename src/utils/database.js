@@ -26,3 +26,12 @@ export async function setPreference(k, v) { const p = (await get('prefs')) || {}
 export async function getReminders() { return (await get('reminders')) || []; }
 export async function addReminder(r) { const list = (await get('reminders')) || []; r.id = Date.now(); list.push(r); await set('reminders', list); return r; }
 export async function removeReminder(id) { const list = (await get('reminders')) || []; await set('reminders', list.filter(r => r.id !== id)); }
+
+// ── DOSING CALCULATOR ──
+export async function getTankConfig() { return (await get('tank_config')) || null; }
+export async function setTankConfig(cfg) { await set('tank_config', cfg); }
+export async function getDosingLog() { return (await get('dosing_log')) || []; }
+export async function addDosingEntry(entry) { const l = (await get('dosing_log')) || []; entry.id = Date.now(); entry.date = new Date().toISOString(); l.unshift(entry); await set('dosing_log', l.slice(0, 200)); }
+export async function deleteDosingEntry(id) { const l = (await get('dosing_log')) || []; await set('dosing_log', l.filter(e => e.id !== id)); }
+export async function getCustomDoses() { return (await get('custom_doses')) || {}; }
+export async function setCustomDose(key, val) { const d = (await get('custom_doses')) || {}; d[key] = val; await set('custom_doses', d); }
