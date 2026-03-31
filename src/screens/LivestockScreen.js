@@ -141,7 +141,7 @@ export default function LivestockScreen({ navigation }) {
 
   // ---- MAIN VIEW ----
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 12 }}>🐠 {t.aquariumHealth}</Text>
 
       {/* Sub-tabs TOP — compact icons, expand on click */}
@@ -273,7 +273,7 @@ export default function LivestockScreen({ navigation }) {
 
 // Shared components
 function DetailScroll({ children, onBack, t }) {
-  return <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+  return <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
     <TouchableOpacity onPress={onBack}><Text style={{ color: '#06b6d4', fontSize: 14, marginBottom: 12 }}>{t.back}</Text></TouchableOpacity>
     {children}
   </ScrollView>;
