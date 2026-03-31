@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { getTankConfig, setTankConfig, getDosingLog, addDosingEntry, deleteDosingEntry, getCustomDoses, setCustomDose } from '../utils/database';
 
 const IS = { backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 10, padding: 10, color: '#e2e8f0', fontSize: 16, marginBottom: 6 };
@@ -10,32 +10,61 @@ const Card = ({ children, style }) => (
   </View>
 );
 
-// ── PRODUCTS — Red Sea & Tropic Marin only ──
+// ── CORAL TYPES & TARGET VALUES ──
+const CORAL_TYPES = {
+  sps: {
+    label: 'SPS', icon: '🪸',
+    desc: 'Acropora, Montipora, Stylo',
+    color: '#ef4444',
+    targets: { ca: 440, alk: 9.0, mg: 1350 },
+    ranges:  { ca: [420,460], alk: [8.0,10.0], mg: [1300,1400] },
+  },
+  lps: {
+    label: 'LPS', icon: '🌊',
+    desc: 'Euphyllia, Acanthastrea, Favia',
+    color: '#f59e0b',
+    targets: { ca: 425, alk: 9.0, mg: 1300 },
+    ranges:  { ca: [400,450], alk: [7.5,11.0], mg: [1250,1350] },
+  },
+  soft: {
+    label: 'Soft', icon: '🪼',
+    desc: 'Zoanthid, Mushroom, Leather',
+    color: '#10b981',
+    targets: { ca: 420, alk: 8.5, mg: 1280 },
+    ranges:  { ca: [380,450], alk: [7.0,11.0], mg: [1200,1350] },
+  },
+  mixed: {
+    label: 'Mixt', icon: '🐠',
+    desc: 'Combinație SPS + LPS + Soft',
+    color: '#8b5cf6',
+    targets: { ca: 430, alk: 9.0, mg: 1300 },
+    ranges:  { ca: [400,450], alk: [8.0,10.0], mg: [1250,1350] },
+  },
+};
+
+// ── PRODUCTS ──
 const PRODUCTS = [
-  // Red Sea AB+
-  { id: 'rs_ab_a',   brand: 'Red Sea',      name: 'AB+ Part A (Calcium)',    element: 'ca',    color: '#ef4444', unit: 'ml', raisePerMlPer100L: 1.4,    idealMin: 400, idealMax: 450, idealTarget: 425 },
-  { id: 'rs_ab_b',   brand: 'Red Sea',      name: 'AB+ Part B (Alkalinity)', element: 'alk',   color: '#f59e0b', unit: 'ml', raisePerMlPer100L: 0.036,  idealMin: 8,   idealMax: 12,  idealTarget: 9   },
-  { id: 'rs_mg',     brand: 'Red Sea',      name: 'Reef Foundation C (Mg)',  element: 'mg',    color: '#8b5cf6', unit: 'ml', raisePerMlPer100L: 1.0,    idealMin: 1250,idealMax: 1350,idealTarget: 1300 },
-  { id: 'rs_trace',  brand: 'Red Sea',      name: 'Reef Colors A/B/C/D',     element: 'trace', color: '#06b6d4', unit: 'ml', raisePerMlPer100L: null,   idealMin: null,idealMax: null,idealTarget: null },
-  // Tropic Marin
-  { id: 'tm_afr',    brand: 'Tropic Marin', name: 'All-For-Reef',            element: 'multi', color: '#10b981', unit: 'ml', raisePerMlPer100L: null,   idealMin: null,idealMax: null,idealTarget: null },
-  { id: 'tm_ca',     brand: 'Tropic Marin', name: 'Pro-Reef Calcium',        element: 'ca',    color: '#ef4444', unit: 'g',  raisePerMlPer100L: 1.5,    idealMin: 400, idealMax: 450, idealTarget: 425 },
-  { id: 'tm_alk',    brand: 'Tropic Marin', name: 'Pro-Reef KH/Alkalinity',  element: 'alk',   color: '#f59e0b', unit: 'g',  raisePerMlPer100L: 0.07,   idealMin: 8,   idealMax: 12,  idealTarget: 9   },
-  { id: 'tm_mg',     brand: 'Tropic Marin', name: 'Pro-Reef Magnesium',      element: 'mg',    color: '#8b5cf6', unit: 'g',  raisePerMlPer100L: 1.0,    idealMin: 1250,idealMax: 1350,idealTarget: 1300 },
+  { id: 'rs_ab_a',  brand: 'Red Sea',      name: 'AB+ Part A',           element: 'ca',    color: '#ef4444', unit: 'ml', ratePerMlPer100L: 1.4   },
+  { id: 'rs_ab_b',  brand: 'Red Sea',      name: 'AB+ Part B',           element: 'alk',   color: '#f59e0b', unit: 'ml', ratePerMlPer100L: 0.036 },
+  { id: 'rs_fc_c',  brand: 'Red Sea',      name: 'Foundation C (Mg)',    element: 'mg',    color: '#8b5cf6', unit: 'ml', ratePerMlPer100L: 1.0   },
+  { id: 'rs_colors',brand: 'Red Sea',      name: 'Reef Colors',          element: 'trace', color: '#06b6d4', unit: 'ml', ratePerMlPer100L: null  },
+  { id: 'tm_afr',   brand: 'Tropic Marin', name: 'All-For-Reef',         element: 'multi', color: '#10b981', unit: 'ml', ratePerMlPer100L: null  },
+  { id: 'tm_ca',    brand: 'Tropic Marin', name: 'Pro-Reef Calcium',     element: 'ca',    color: '#ef4444', unit: 'g',  ratePerMlPer100L: 1.5   },
+  { id: 'tm_alk',   brand: 'Tropic Marin', name: 'Pro-Reef KH/Alk',      element: 'alk',   color: '#f59e0b', unit: 'g',  ratePerMlPer100L: 0.07  },
+  { id: 'tm_mg',    brand: 'Tropic Marin', name: 'Pro-Reef Magnesium',   element: 'mg',    color: '#8b5cf6', unit: 'g',  ratePerMlPer100L: 1.0   },
 ];
 
 const ELEM_LABEL = { ca: 'Calciu', alk: 'Alcalinitate', mg: 'Magneziu', trace: 'Oligoelemente', multi: 'All-in-One' };
-const ELEM_UNIT  = { ca: 'ppm', alk: 'dKH', mg: 'ppm', trace: 'ml/100L', multi: 'ml/100L' };
-
+const ELEM_UNIT  = { ca: 'ppm', alk: 'dKH', mg: 'ppm' };
 const fmt = (d) => { try { return new Date(d).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return ''; } };
 
 export default function DosingCalculator() {
-  const [tab, setTab] = useState('calc');
+  const [tab, setTab]           = useState('calc');
   const [netVol, setNetVol]     = useState('');
   const [savedVol, setSavedVol] = useState(null);
+  const [coralType, setCoralType] = useState(null);   // sps | lps | soft | mixed
   const [selProd, setSelProd]   = useState(null);
   const [curVal, setCurVal]     = useState('');
-  const [tgtVal, setTgtVal]     = useState('');
   const [result, setResult]     = useState(null);
   const [customDoses, setCustomDoses] = useState({});
   const [editCustom, setEditCustom]   = useState(null);
@@ -50,51 +79,61 @@ export default function DosingCalculator() {
   async function loadAll() {
     const cfg = await getTankConfig();
     if (cfg?.netVol) setSavedVol(cfg.netVol);
-    const cd = await getCustomDoses();
-    setCustomDoses(cd || {});
-    const l = await getDosingLog();
-    setLog(l || []);
+    if (cfg?.coralType) setCoralType(cfg.coralType);
+    setCustomDoses((await getCustomDoses()) || {});
+    setLog((await getDosingLog()) || []);
   }
 
   async function saveVolume() {
     const v = parseFloat(netVol);
     if (!v || v <= 0) { Alert.alert('Eroare', 'Introdu un volum valid'); return; }
-    await setTankConfig({ netVol: v });
+    const cfg = await getTankConfig() || {};
+    await setTankConfig({ ...cfg, netVol: v });
     setSavedVol(v);
-    Alert.alert('✅ Salvat', `Volum net: ${v} L`);
+  }
+
+  async function saveCoralType(type) {
+    setCoralType(type);
+    setSelProd(null); setResult(null); setCurVal('');
+    const cfg = await getTankConfig() || {};
+    await setTankConfig({ ...cfg, coralType: type });
   }
 
   const vol = savedVol || parseFloat(netVol) || 0;
+  const coral = coralType ? CORAL_TYPES[coralType] : null;
 
   function calculate() {
-    if (!selProd) return;
+    if (!selProd || !coral) return;
     const p = PRODUCTS.find(x => x.id === selProd);
     if (!p) return;
 
-    // All-For-Reef or trace: show flat daily dose
-    if (!p.raisePerMlPer100L) {
-      const daily = p.id === 'tm_afr' ? (vol / 100).toFixed(1) : (vol / 100).toFixed(1);
-      setResult({ type: 'daily', amount: daily, unit: p.unit, product: p.name });
+    // Flat daily dose for trace / all-in-one
+    if (!p.ratePerMlPer100L) {
+      const daily = (vol / 100).toFixed(1);
+      setResult({ type: 'daily', amount: daily, unit: p.unit, product: p.name, element: p.element });
       return;
     }
 
     const cur = parseFloat(curVal);
-    const tgt = parseFloat(tgtVal) || p.idealTarget;
     if (isNaN(cur)) { Alert.alert('Eroare', 'Introdu valoarea actuală'); return; }
-    if (tgt <= cur) { Alert.alert('Eroare', 'Valoarea țintă trebuie să fie mai mare'); return; }
     if (!vol) { Alert.alert('Eroare', 'Setează volumul mai întâi'); return; }
 
-    const diff = tgt - cur;
-    const rate = customDoses[selProd] || p.raisePerMlPer100L;
+    const target = coral.targets[p.element];
+    if (cur >= target) {
+      setResult({ type: 'ok', element: p.element, cur, target, product: p.name });
+      return;
+    }
+
+    const diff = target - cur;
+    const rate = customDoses[selProd] || p.ratePerMlPer100L;
     const dose = (diff / rate) * (vol / 100);
-    setResult({ type: 'correction', amount: dose.toFixed(1), unit: p.unit, diff: diff.toFixed(2), element: p.element, product: p.name });
+    setResult({ type: 'correction', amount: dose.toFixed(1), unit: p.unit, diff: diff.toFixed(2), element: p.element, product: p.name, target, cur });
   }
 
   async function saveCustom() {
     if (!editCustom || !customInput) return;
-    const v = parseFloat(customInput);
-    await setCustomDose(editCustom, v);
-    setCustomDoses({ ...customDoses, [editCustom]: v });
+    await setCustomDose(editCustom, parseFloat(customInput));
+    setCustomDoses({ ...customDoses, [editCustom]: parseFloat(customInput) });
     setEditCustom(null); setCustomInput('');
   }
 
@@ -122,16 +161,18 @@ export default function DosingCalculator() {
 
   return (
     <View style={{ backgroundColor: '#0a1628', borderRadius: 16, borderWidth: 1, borderColor: '#06b6d430', marginBottom: 16, overflow: 'hidden' }}>
-      {/* Header */}
+
+      {/* Header — volume input */}
       <View style={{ backgroundColor: '#06b6d415', padding: 14, borderBottomWidth: 1, borderBottomColor: '#06b6d425', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View>
           <Text style={{ color: '#06b6d4', fontSize: 15, fontWeight: '700' }}>🧮 Calculator Dozare</Text>
-          {savedVol && <Text style={{ color: '#64748b', fontSize: 11, marginTop: 1 }}>Volum: <Text style={{ color: '#10b981', fontWeight: '700' }}>{savedVol} L</Text></Text>}
+          {savedVol ? <Text style={{ color: '#64748b', fontSize: 11, marginTop: 1 }}>Volum net: <Text style={{ color: '#10b981', fontWeight: '700' }}>{savedVol} L</Text></Text>
+                    : <Text style={{ color: '#f59e0b', fontSize: 11, marginTop: 1 }}>Setează volumul →</Text>}
         </View>
-        {/* Inline volume input */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <TextInput keyboardType="decimal-pad" value={netVol} onChangeText={setNetVol}
-            placeholder="Volum net (L)" placeholderTextColor="#475569"
+            placeholder={savedVol ? savedVol.toString() : 'Volum net (L)'}
+            placeholderTextColor="#475569"
             style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, color: '#e2e8f0', fontSize: 14, width: 130 }} />
           <TouchableOpacity onPress={saveVolume} style={{ backgroundColor: '#06b6d4', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
             <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>OK</Text>
@@ -153,8 +194,39 @@ export default function DosingCalculator() {
 
         {/* ── CALCULATOR TAB ── */}
         {tab === 'calc' && (<>
-          {/* Brand filter */}
-          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 12 }}>
+
+          {/* Step 1 — Coral type */}
+          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>1 · Tip corali în acvariu</Text>
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 16 }}>
+            {Object.entries(CORAL_TYPES).map(([key, ct]) => (
+              <TouchableOpacity key={key} onPress={() => saveCoralType(key)}
+                style={{ flex: 1, backgroundColor: coralType === key ? `${ct.color}20` : '#1e293b', borderWidth: 1.5, borderColor: coralType === key ? ct.color : '#334155', borderRadius: 10, padding: 8, alignItems: 'center' }}>
+                <Text style={{ fontSize: 18 }}>{ct.icon}</Text>
+                <Text style={{ color: coralType === key ? ct.color : '#94a3b8', fontSize: 12, fontWeight: '700', marginTop: 3 }}>{ct.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Show targets for selected coral type */}
+          {coral && (
+            <View style={{ backgroundColor: `${coral.color}10`, borderWidth: 1, borderColor: `${coral.color}30`, borderRadius: 12, padding: 12, marginBottom: 14 }}>
+              <Text style={{ color: coral.color, fontSize: 12, fontWeight: '700', marginBottom: 6 }}>{coral.icon} {coral.label} — {coral.desc}</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                {['ca', 'alk', 'mg'].map(el => (
+                  <View key={el} style={{ alignItems: 'center' }}>
+                    <Text style={{ color: '#64748b', fontSize: 10 }}>{ELEM_LABEL[el]}</Text>
+                    <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '700' }}>{coral.targets[el]}</Text>
+                    <Text style={{ color: '#475569', fontSize: 9 }}>{ELEM_UNIT[el]}</Text>
+                    <Text style={{ color: '#334155', fontSize: 9 }}>({coral.ranges[el][0]}–{coral.ranges[el][1]})</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Step 2 — Product */}
+          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>2 · Selectează produs</Text>
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 10 }}>
             {['Toate', 'Red Sea', 'Tropic Marin'].map(b => (
               <TouchableOpacity key={b} onPress={() => { setBrandFilter(b); setSelProd(null); setResult(null); }}
                 style={{ flex: 1, backgroundColor: brandFilter === b ? '#06b6d420' : '#1e293b', borderWidth: 1, borderColor: brandFilter === b ? '#06b6d460' : '#334155', borderRadius: 8, paddingVertical: 7, alignItems: 'center' }}>
@@ -163,13 +235,12 @@ export default function DosingCalculator() {
             ))}
           </View>
 
-          {/* Product list */}
           <View style={{ gap: 6, marginBottom: 14 }}>
             {filtered.map(p => {
               const isSel = selProd === p.id;
               const hasCustom = customDoses[p.id];
               return (
-                <TouchableOpacity key={p.id} onPress={() => { setSelProd(p.id); setResult(null); setCurVal(''); setTgtVal(''); }}
+                <TouchableOpacity key={p.id} onPress={() => { setSelProd(p.id); setResult(null); setCurVal(''); }}
                   style={{ backgroundColor: isSel ? `${p.color}18` : '#1e293b', borderWidth: 1, borderColor: isSel ? `${p.color}50` : '#334155', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: p.color }} />
                   <View style={{ flex: 1 }}>
@@ -183,74 +254,96 @@ export default function DosingCalculator() {
             })}
           </View>
 
-          {/* Calculator for selected */}
+          {/* Step 3 — Current value + calculate */}
           {selProd && (() => {
             const p = PRODUCTS.find(x => x.id === selProd);
             if (!p) return null;
             const hasCustom = customDoses[selProd];
+            const target = coral?.targets[p.element];
+
             return (
               <Card style={{ borderColor: `${p.color}30` }}>
-                <Text style={{ color: p.color, fontSize: 13, fontWeight: '700', marginBottom: 4 }}>{p.name}</Text>
+                <Text style={{ color: p.color, fontSize: 13, fontWeight: '700', marginBottom: 8 }}>
+                  {!coral ? '⚠️ Selectează mai întâi tipul de corali' : p.ratePerMlPer100L ? `3 · Valoare actuală ${ELEM_LABEL[p.element]}` : '3 · Calculează doza zilnică'}
+                </Text>
 
-                {/* Custom dose */}
-                <TouchableOpacity onPress={() => { setEditCustom(editCustom === selProd ? null : selProd); setCustomInput(hasCustom?.toString() || ''); }}
-                  style={{ backgroundColor: '#1e293b', borderRadius: 8, padding: 8, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#94a3b8', fontSize: 11 }}>✏️ Doză personalizată ({hasCustom ? hasCustom + ' ' + p.unit + '/100L' : 'standard'})</Text>
-                  <Text style={{ color: '#64748b', fontSize: 10 }}>{editCustom === selProd ? '▲' : '▼'}</Text>
-                </TouchableOpacity>
+                {/* Custom dose editor */}
+                {p.ratePerMlPer100L && (
+                  <>
+                    <TouchableOpacity onPress={() => { setEditCustom(editCustom === selProd ? null : selProd); setCustomInput(hasCustom?.toString() || ''); }}
+                      style={{ backgroundColor: '#1e293b', borderRadius: 8, padding: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ color: '#94a3b8', fontSize: 11 }}>✏️ Doză personalizată ({hasCustom ? hasCustom + ' ' + p.unit + '/100L' : 'standard: ' + p.ratePerMlPer100L + ' ' + p.unit + '/100L'})</Text>
+                      <Text style={{ color: '#64748b', fontSize: 10 }}>{editCustom === selProd ? '▲' : '▼'}</Text>
+                    </TouchableOpacity>
+                    {editCustom === selProd && (
+                      <View style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 10 }}>
+                        <Label text={`Doză (${p.unit}/100L) — Standard: ${p.ratePerMlPer100L}`} />
+                        <TextInput keyboardType="decimal-pad" value={customInput} onChangeText={setCustomInput}
+                          placeholder={p.ratePerMlPer100L.toString()} placeholderTextColor="#475569" style={IS} />
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                          <TouchableOpacity onPress={saveCustom} style={{ flex: 1, backgroundColor: '#f59e0b20', borderRadius: 8, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#f59e0b40' }}>
+                            <Text style={{ color: '#f59e0b', fontSize: 12, fontWeight: '600' }}>Salvează</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => resetCustom(selProd)} style={{ flex: 1, backgroundColor: '#ef444415', borderRadius: 8, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#ef444430' }}>
+                            <Text style={{ color: '#f87171', fontSize: 12 }}>Reset standard</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+                  </>
+                )}
 
-                {editCustom === selProd && (
-                  <View style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 10 }}>
-                    <Label text={`Doză (${p.unit}/100L) — Standard: ${p.raisePerMlPer100L || '—'}`} />
-                    <TextInput keyboardType="decimal-pad" value={customInput} onChangeText={setCustomInput}
-                      placeholder={p.raisePerMlPer100L?.toString() || ''} placeholderTextColor="#475569" style={IS} />
-                    <View style={{ flexDirection: 'row', gap: 8 }}>
-                      <TouchableOpacity onPress={saveCustom} style={{ flex: 1, backgroundColor: '#f59e0b20', borderRadius: 8, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#f59e0b40' }}>
-                        <Text style={{ color: '#f59e0b', fontSize: 12, fontWeight: '600' }}>Salvează</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => resetCustom(selProd)} style={{ flex: 1, backgroundColor: '#ef444415', borderRadius: 8, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: '#ef444430' }}>
-                        <Text style={{ color: '#f87171', fontSize: 12 }}>Reset standard</Text>
-                      </TouchableOpacity>
+                {coral && p.ratePerMlPer100L && target && (
+                  <View style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <Label text={`Valoare actuală (${ELEM_UNIT[p.element]})`} />
+                      <Text style={{ color: '#64748b', fontSize: 10 }}>Țintă {coral.label}: <Text style={{ color: coral.color, fontWeight: '700' }}>{target} {ELEM_UNIT[p.element]}</Text></Text>
                     </View>
+                    <TextInput keyboardType="decimal-pad" value={curVal} onChangeText={setCurVal}
+                      placeholder={`Valoare actuală (${coral.ranges[p.element][0]}–${coral.ranges[p.element][1]})`}
+                      placeholderTextColor="#475569" style={IS} />
                   </View>
                 )}
 
-                {p.raisePerMlPer100L && (<>
-                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-                    <View style={{ flex: 1 }}>
-                      <Label text={`Valoare actuală (${ELEM_UNIT[p.element]})`} />
-                      <TextInput keyboardType="decimal-pad" value={curVal} onChangeText={setCurVal}
-                        placeholder={p.idealMin?.toString() || '0'} placeholderTextColor="#475569" style={IS} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Label text={`Valoare țintă (${ELEM_UNIT[p.element]})`} />
-                      <TextInput keyboardType="decimal-pad" value={tgtVal} onChangeText={setTgtVal}
-                        placeholder={p.idealTarget?.toString() || ''} placeholderTextColor="#475569" style={IS} />
-                    </View>
-                  </View>
-                </>)}
-
-                <TouchableOpacity onPress={calculate} style={{ backgroundColor: p.color, borderRadius: 10, padding: 12, alignItems: 'center' }}>
+                <TouchableOpacity onPress={calculate}
+                  disabled={!coral}
+                  style={{ backgroundColor: coral ? p.color : '#334155', borderRadius: 10, padding: 12, alignItems: 'center' }}>
                   <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>
-                    {p.raisePerMlPer100L ? 'Calculează Corecție' : 'Calculează Doză Zilnică'}
+                    {p.ratePerMlPer100L ? 'Calculează' : 'Calculează Doză Zilnică'}
                   </Text>
                 </TouchableOpacity>
 
                 {result && (
-                  <View style={{ backgroundColor: '#10b98115', borderWidth: 1, borderColor: '#10b98140', borderRadius: 12, padding: 14, marginTop: 12, alignItems: 'center' }}>
-                    {result.type === 'correction' ? (<>
-                      <Text style={{ color: '#94a3b8', fontSize: 12 }}>Doză corecție · {vol}L</Text>
-                      <Text style={{ color: '#10b981', fontSize: 28, fontWeight: '800', marginVertical: 4 }}>{result.amount} {result.unit}</Text>
-                      <Text style={{ color: '#64748b', fontSize: 12 }}>↑ {result.diff} {ELEM_UNIT[result.element]}</Text>
-                      <Text style={{ color: '#f59e0b', fontSize: 11, marginTop: 6, textAlign: 'center' }}>⚠️ Adaugă treptat. Verifică după 24h.</Text>
-                    </>) : (<>
-                      <Text style={{ color: '#94a3b8', fontSize: 12 }}>Doză zilnică · {vol}L</Text>
-                      <Text style={{ color: '#10b981', fontSize: 28, fontWeight: '800', marginVertical: 4 }}>{result.amount} {result.unit}/zi</Text>
-                    </>)}
-                    <TouchableOpacity onPress={() => { setLogForm({ product: result.product, element: result.element || 'ca', amount: result.amount, unit: result.unit || 'ml', notes: '' }); setShowLogForm(true); setTab('log'); }}
-                      style={{ marginTop: 10, backgroundColor: '#06b6d420', borderWidth: 1, borderColor: '#06b6d440', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}>
-                      <Text style={{ color: '#06b6d4', fontSize: 12, fontWeight: '600' }}>📋 Înregistrează în jurnal →</Text>
-                    </TouchableOpacity>
+                  <View style={{ marginTop: 12 }}>
+                    {result.type === 'ok' ? (
+                      <View style={{ backgroundColor: '#10b98115', borderWidth: 1, borderColor: '#10b98140', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+                        <Text style={{ color: '#10b981', fontSize: 22, fontWeight: '800' }}>✅ Valoare OK</Text>
+                        <Text style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
+                          Actual {result.cur} {ELEM_UNIT[result.element]} ≥ Țintă {result.target} {ELEM_UNIT[result.element]}
+                        </Text>
+                      </View>
+                    ) : result.type === 'correction' ? (
+                      <View style={{ backgroundColor: '#10b98115', borderWidth: 1, borderColor: '#10b98140', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+                        <Text style={{ color: '#94a3b8', fontSize: 12 }}>Doză corecție · {vol}L · {coral.label}</Text>
+                        <Text style={{ color: '#10b981', fontSize: 30, fontWeight: '800', marginVertical: 4 }}>{result.amount} {result.unit}</Text>
+                        <Text style={{ color: '#64748b', fontSize: 12 }}>{result.cur} → {result.target} {ELEM_UNIT[result.element]} (+{result.diff})</Text>
+                        <Text style={{ color: '#f59e0b', fontSize: 11, marginTop: 6, textAlign: 'center' }}>⚠️ Adaugă treptat. Verifică după 24h.</Text>
+                        <TouchableOpacity onPress={() => { setLogForm({ product: result.product, element: result.element, amount: result.amount, unit: result.unit, notes: `${coral.label}: ${result.cur}→${result.target} ${ELEM_UNIT[result.element]}` }); setShowLogForm(true); setTab('log'); }}
+                          style={{ marginTop: 10, backgroundColor: '#06b6d420', borderWidth: 1, borderColor: '#06b6d440', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}>
+                          <Text style={{ color: '#06b6d4', fontSize: 12, fontWeight: '600' }}>📋 Înregistrează →</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : result.type === 'daily' ? (
+                      <View style={{ backgroundColor: '#10b98115', borderWidth: 1, borderColor: '#10b98140', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+                        <Text style={{ color: '#94a3b8', fontSize: 12 }}>Doză zilnică · {vol}L</Text>
+                        <Text style={{ color: '#10b981', fontSize: 30, fontWeight: '800', marginVertical: 4 }}>{result.amount} {result.unit}/zi</Text>
+                        <Text style={{ color: '#64748b', fontSize: 11 }}>Ajustează în funcție de consumul real al coralilor</Text>
+                        <TouchableOpacity onPress={() => { setLogForm({ product: result.product, element: result.element, amount: result.amount, unit: result.unit, notes: '' }); setShowLogForm(true); setTab('log'); }}
+                          style={{ marginTop: 10, backgroundColor: '#06b6d420', borderWidth: 1, borderColor: '#06b6d440', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 }}>
+                          <Text style={{ color: '#06b6d4', fontSize: 12, fontWeight: '600' }}>📋 Înregistrează →</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : null}
                   </View>
                 )}
               </Card>
@@ -273,7 +366,6 @@ export default function DosingCalculator() {
               <Label text="Produs" />
               <TextInput value={logForm.product} onChangeText={v => setLogForm({ ...logForm, product: v })}
                 placeholder="ex: Red Sea AB+ Part A" placeholderTextColor="#475569" style={IS} />
-              {/* Element selector */}
               <Label text="Element" />
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                 {['ca', 'alk', 'mg', 'trace', 'multi'].map(el => (
