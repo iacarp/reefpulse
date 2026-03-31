@@ -13,7 +13,7 @@ const T = {
     myAquarium: 'My Aquarium', coralsLabel: 'Corals', fishLabel: 'Fish', invertsLabel: 'Inverts', testsLabel: 'Tests',
     alkTrend: 'Alkalinity Trend',
     // Params
-    paramJournal: 'Parameter Journal', paramsDash: 'Parameters', historyTab: 'History',, newTest: '+ New Test', cancel: '✕ Cancel',
+    paramJournal: 'Parameter Journal', paramsDash: 'Parameters', historyTab: 'History', newTest: '+ New Test', cancel: '✕ Cancel',
     addTestTitle: 'Add Test', date: 'Date', coreParams: 'Core Parameters',
     extraParams: 'Extra Parameters', addExtraParams: '＋ Extra params (Iodine, Strontium, NH3...)',
     hideExtra: '▲ Hide extra params', save: '💾 Save Test', noEntries: 'No entries. Add your first test!',
@@ -114,7 +114,7 @@ const T = {
     criticalAlerts: 'Alerte Critice', tapForDiag: 'Apasă pentru diagnostic complet →',
     myAquarium: 'Acvariul Meu', coralsLabel: 'Corali', fishLabel: 'Pești', invertsLabel: 'Neverte.', testsLabel: 'Teste',
     alkTrend: 'Trend Alkalinitate',
-    paramJournal: 'Jurnal Parametri', paramsDash: 'Parametri', historyTab: 'Istoric',, newTest: '+ Test Nou', cancel: '✕ Anulează',
+    paramJournal: 'Jurnal Parametri', paramsDash: 'Parametri', historyTab: 'Istoric', newTest: '+ Test Nou', cancel: '✕ Anulează',
     addTestTitle: 'Adaugă Test', date: 'Data', coreParams: 'Parametri de Bază',
     extraParams: 'Parametri Extra', addExtraParams: '＋ Parametri extra (Iod, Stronțiu, NH3...)',
     hideExtra: '▲ Ascunde parametri extra', save: '💾 Salvează Testul', noEntries: 'Nicio înregistrare. Adaugă primul test!',
