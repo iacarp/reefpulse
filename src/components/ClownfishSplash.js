@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform, Animated } from 'react-native';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -362,10 +362,7 @@ export default function ClownfishSplash({ onFinish }) {
     }
     frame();
 
-    // auto-finish after 3.5s
-    const timer = setTimeout(() => { if (onFinish) onFinish(); }, 3500);
-
-    return () => { cancelAnimationFrame(animId); clearTimeout(timer); };
+    return () => { cancelAnimationFrame(animId); };
   }, []);
 
   if (Platform.OS !== 'web') return null;
@@ -384,6 +381,10 @@ export default function ClownfishSplash({ onFinish }) {
         <View style={styles.divider} />
         <Text style={styles.tagline}>Track · Diagnose · Thrive</Text>
       </Animated.View>
+      <Animated.View style={[styles.hintWrap, { opacity: uiOpacity }]}>
+        <Text style={styles.hint}>tap the fish</Text>
+      </Animated.View>
+      <TouchableOpacity style={styles.tapZone} activeOpacity={1} onPress={onFinish} />
     </View>
   );
 }

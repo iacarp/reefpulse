@@ -49,7 +49,7 @@ export default function ParametersScreen({ navigation }) {
   activeExtra.forEach(k => { const ep = EXTRA_PARAMS.find(x => x.key === k); if (ep) allP[k] = ep; });
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700' }}>🧪 {t.paramJournal}</Text>
         <TouchableOpacity onPress={() => setShowAdd(!showAdd)}

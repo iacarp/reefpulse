@@ -45,7 +45,7 @@ export default function DiagnosticsScreen() {
   const all = [...crits, ...warns, ...trends];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
       <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 16 }}>🩺 {t.smartDiag}</Text>
 
       {entries.length < 1 ? (
