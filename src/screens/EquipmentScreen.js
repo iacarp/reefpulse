@@ -9,9 +9,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const IS = { backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 10, padding: 10, color: '#e2e8f0', fontSize: 16, marginBottom: 10 };
 const Card = ({ children, style = {} }) => <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1e293b', marginBottom: 10, ...style }}>{children}</View>;
 
-// ── TODO STORAGE ──
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_LETTERS = ['S','M','T','W','T','F','S'];
+
 async function getTodos() { try { const d = await AsyncStorage.getItem('todos'); return d ? JSON.parse(d) : []; } catch { return []; } }
-async function saveTodos(todos) { await AsyncStorage.setItem('todos', JSON.stringify(todos)); }
+async function saveTodos(t) { await AsyncStorage.setItem('todos', JSON.stringify(t)); }
 
 export default function EquipmentScreen({ navigation }) {
   const { t } = useI18n();
@@ -20,15 +22,21 @@ export default function EquipmentScreen({ navigation }) {
   const [todos, setTodos] = useState([]);
   const [selCat, setSelCat] = useState(null);
   const [cf, setCf] = useState({ name: '', category: '', brand: '', maintenance_schedule_days: '30', notes: '' });
-  const [newTodo, setNewTodo] = useState('');
-  const [showTodoInput, setShowTodoInput] = useState(false);
-  // reminder modal after adding equipment
+
+  // Calendar state
+  const today = new Date();
+  const [calYear, setCalYear]   = useState(today.getFullYear());
+  const [calMonth, setCalMonth] = useState(today.getMonth());
+  const [selDay, setSelDay]     = useState(null); // {year, month, day}
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [newTaskText, setNewTaskText] = useState('');
+
+  // Reminder modal
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [pendingEq, setPendingEq] = useState(null);
   const [reminderDays, setReminderDays] = useState('30');
 
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
 
   const load = async () => {
     setMyEq(await getMyEquipment());
@@ -41,100 +49,63 @@ export default function EquipmentScreen({ navigation }) {
     return unsub;
   }, [navigation]);
 
-  // Equipment due items (overdue or due soon)
-  const dueItems = myEq.filter(eq => {
-    const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
-    const days = last ? Math.floor((now - last) / 864e5) : 999;
-    const sched = eq.maintenance_schedule_days || 30;
-    return days >= sched * 0.9;
+  // Calendar helpers
+  const daysInMonth  = new Date(calYear, calMonth + 1, 0).getDate();
+  const firstDow     = new Date(calYear, calMonth, 1).getDay();
+  const prevMonth    = () => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y-1); } else setCalMonth(m => m-1); setSelDay(null); };
+  const nextMonth    = () => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y+1); } else setCalMonth(m => m+1); setSelDay(null); };
+
+  // Mark days that have todos or due equipment
+  const markedDays = {};
+  todos.forEach(td => {
+    if (td.date) {
+      const d = new Date(td.date);
+      if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
+        const day = d.getDate();
+        if (!markedDays[day]) markedDays[day] = { todos: 0, eq: 0 };
+        markedDays[day].todos++;
+      }
+    }
   });
-
-  // Build calendar data for current month
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
-
-  // Mark days that have due equipment
-  const dueDays = {};
+  // Equipment due dates
   myEq.forEach(eq => {
     const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
     const sched = eq.maintenance_schedule_days || 30;
     if (last) {
-      const dueDate = new Date(last);
-      dueDate.setDate(dueDate.getDate() + sched);
-      if (dueDate.getMonth() === month && dueDate.getFullYear() === year) {
-        const d = dueDate.getDate();
-        if (!dueDays[d]) dueDays[d] = [];
-        dueDays[d].push(eq.name);
+      const due = new Date(last); due.setDate(due.getDate() + sched);
+      if (due.getFullYear() === calYear && due.getMonth() === calMonth) {
+        const day = due.getDate();
+        if (!markedDays[day]) markedDays[day] = { todos: 0, eq: 0 };
+        markedDays[day].eq++;
       }
     }
   });
 
-  // Todo for today from equipment
-  const eqTodayDue = myEq.filter(eq => {
+  // Selected day string
+  const selDayStr = selDay ? `${selDay.year}-${String(selDay.month+1).padStart(2,'0')}-${String(selDay.day).padStart(2,'0')}` : null;
+  const selDayTodos = todos.filter(td => td.date === selDayStr);
+  const selDayEqDue = selDay ? myEq.filter(eq => {
+    const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
+    const sched = eq.maintenance_schedule_days || 30;
+    if (!last) return false;
+    const due = new Date(last); due.setDate(due.getDate() + sched);
+    return due.getFullYear() === selDay.year && due.getMonth() === selDay.month && due.getDate() === selDay.day;
+  }) : [];
+
+  const isToday = (year, month, day) => year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
+
+  // Equipment overdue now
+  const eqOverdue = myEq.filter(eq => {
     const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
     const days = last ? Math.floor((now - last) / 864e5) : 999;
     return days >= (eq.maintenance_schedule_days || 30);
   });
 
-  // Manual todos for today
-  const todayTodos = todos.filter(td => !td.date || td.date === todayStr);
-  const doneTodos  = todos.filter(td => td.done && td.date === todayStr);
-
-  const handleAddEquipment = async (eqData) => {
-    const id = await addEquipment({ ...eqData, is_custom: true });
-    setPendingEq({ ...eqData, id });
-    setShowReminderModal(true);
-    await load();
-  };
-
-  const handleAddDB = async (cat, item) => {
-    await addEquipment({ category: cat, name: item.name, brand: '', maintenance_schedule_days: 30, notes: item.notes, is_custom: false });
-    const allEq = await getMyEquipment();
-    const added = allEq[allEq.length - 1];
-    setPendingEq(added);
-    setShowReminderModal(true);
-    await load(); setTab('equipment');
-  };
-
-  const handleAddCustom = async () => {
-    if (!cf.name || !cf.category) { Alert.alert(t.error || 'Error', 'Name + Category required'); return; }
-    await handleAddEquipment({ ...cf, maintenance_schedule_days: parseInt(cf.maintenance_schedule_days) || 30 });
-    setCf({ name: '', category: '', brand: '', maintenance_schedule_days: '30', notes: '' });
-    setTab('equipment');
-  };
-
-  const saveReminderDays = async () => {
-    if (pendingEq) {
-      // Update the equipment with the reminder interval
-      const all = await getMyEquipment();
-      const idx = all.findIndex(e => e.id === pendingEq.id);
-      if (idx >= 0) { all[idx].maintenance_schedule_days = parseInt(reminderDays) || 30; await AsyncStorage.setItem('equipment', JSON.stringify(all)); }
-    }
-    setShowReminderModal(false); setPendingEq(null); setReminderDays('30');
-    await load();
-  };
-
-  const handleMaint = async (eq) => {
-    await logMaintenance(eq.id);
-    // Mark related todos as done
-    const updated = todos.map(td => td.eqId === eq.id ? { ...td, done: true } : td);
-    await saveTodos(updated); setTodos(updated);
-    await load();
-  };
-
-  const handleRemoveEq = (eq) => {
-    Alert.alert(t.deleteConfirm || 'Delete?', '', [
-      { text: t.cancelBtn || 'Cancel', style: 'cancel' },
-      { text: t.confirm || 'Delete', style: 'destructive', onPress: async () => { await removeEquipment(eq.id); await load(); } },
-    ]);
-  };
-
-  const addManualTodo = async () => {
-    if (!newTodo.trim()) return;
-    const updated = [...todos, { id: Date.now(), text: newTodo.trim(), done: false, date: todayStr }];
-    await saveTodos(updated); setTodos(updated); setNewTodo(''); setShowTodoInput(false);
+  // Add task to selected day
+  const addTaskToDay = async () => {
+    if (!newTaskText.trim() || !selDayStr) return;
+    const updated = [...todos, { id: Date.now(), text: newTaskText.trim(), done: false, date: selDayStr }];
+    await saveTodos(updated); setTodos(updated); setNewTaskText(''); setShowAddTask(false);
   };
 
   const toggleTodo = async (id) => {
@@ -147,16 +118,60 @@ export default function EquipmentScreen({ navigation }) {
     await saveTodos(updated); setTodos(updated);
   };
 
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const dayLetters = ['S','M','T','W','T','F','S'];
+  // Equipment handlers
+  const handleAddDB = async (cat, item) => {
+    await addEquipment({ category: cat, name: item.name, brand: '', maintenance_schedule_days: 30, notes: item.notes, is_custom: false });
+    const all = await getMyEquipment();
+    setPendingEq(all[all.length - 1]);
+    setShowReminderModal(true);
+    await load(); setTab('equipment');
+  };
+
+  const handleAddCustom = async () => {
+    if (!cf.name || !cf.category) { Alert.alert(t.error || 'Error', 'Name + Category required'); return; }
+    await addEquipment({ ...cf, maintenance_schedule_days: parseInt(cf.maintenance_schedule_days) || 30, is_custom: true });
+    const all = await getMyEquipment();
+    setPendingEq(all[all.length - 1]);
+    setCf({ name: '', category: '', brand: '', maintenance_schedule_days: '30', notes: '' });
+    setShowReminderModal(true);
+    await load(); setTab('equipment');
+  };
+
+  const saveReminderDays = async () => {
+    if (pendingEq) {
+      const all = await getMyEquipment();
+      const idx = all.findIndex(e => e.id === pendingEq.id);
+      if (idx >= 0) { all[idx].maintenance_schedule_days = parseInt(reminderDays) || 30; await AsyncStorage.setItem('equipment', JSON.stringify(all)); }
+    }
+    setShowReminderModal(false); setPendingEq(null); setReminderDays('30'); await load();
+  };
+
+  const handleMaint = async (eq) => {
+    await logMaintenance(eq.id); await load();
+  };
+
+  const handleRemoveEq = (eq) => {
+    Alert.alert(t.deleteConfirm || 'Delete?', '', [
+      { text: t.cancelBtn || 'Cancel', style: 'cancel' },
+      { text: t.confirm || 'Delete', style: 'destructive', onPress: async () => { await removeEquipment(eq.id); await load(); } },
+    ]);
+  };
 
   const stabs = [
-    { id: 'calendar', icon: '📅', label: t.calendarTab || 'Calendar' },
-    { id: 'todo',     icon: '✅', label: t.todoTab || 'To Do' },
-    { id: 'equipment',icon: '⚙️', label: t.equipmentTab || 'Equipment' },
-    { id: 'catalog',  icon: '📋', label: t.catalog || 'Catalog' },
-    { id: 'custom',   icon: '➕', label: t.custom || 'Add' },
+    { id: 'calendar',  icon: '📅', label: t.calendarTab  || 'Calendar' },
+    { id: 'todo',      icon: '✅', label: t.todoTab       || 'To Do' },
+    { id: 'equipment', icon: '⚙️', label: t.equipmentTab  || 'Equipment' },
+    { id: 'catalog',   icon: '📋', label: t.catalog       || 'Catalog' },
+    { id: 'custom',    icon: '➕', label: t.custom        || 'Add' },
   ];
+
+  // All future/upcoming todos sorted by date
+  const allSortedTodos = [...todos].sort((a,b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(a.date) - new Date(b.date);
+  });
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
@@ -176,99 +191,151 @@ export default function EquipmentScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* ══════ CALENDAR TAB ══════ */}
+      {/* ══════ CALENDAR ══════ */}
       {tab === 'calendar' && (<>
         <Card>
-          {/* Month header */}
-          <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700', textAlign: 'center', marginBottom: 12 }}>
-            {monthNames[month]} {year}
-          </Text>
+          {/* Month navigation */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <TouchableOpacity onPress={prevMonth} style={{ backgroundColor: '#1e293b', borderRadius: 8, padding: 8 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 18 }}>‹</Text>
+            </TouchableOpacity>
+            <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700' }}>
+              {MONTH_NAMES[calMonth]} {calYear}
+            </Text>
+            <TouchableOpacity onPress={nextMonth} style={{ backgroundColor: '#1e293b', borderRadius: 8, padding: 8 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 18 }}>›</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Day letters */}
           <View style={{ flexDirection: 'row', marginBottom: 6 }}>
-            {dayLetters.map((d, i) => (
+            {DAY_LETTERS.map((d, i) => (
               <Text key={i} style={{ flex: 1, textAlign: 'center', color: '#475569', fontSize: 11, fontWeight: '600' }}>{d}</Text>
             ))}
           </View>
 
-          {/* Calendar grid */}
+          {/* Grid */}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-            {/* Empty cells before first day */}
             {Array(firstDow).fill(null).map((_, i) => (
               <View key={`e${i}`} style={{ width: '14.28%', aspectRatio: 1 }} />
             ))}
-            {/* Day cells */}
             {Array(daysInMonth).fill(null).map((_, i) => {
               const day = i + 1;
-              const isToday = day === now.getDate();
-              const hasDue  = dueDays[day]?.length > 0;
-              const isPast  = day < now.getDate();
+              const isTd  = isToday(calYear, calMonth, day);
+              const isSel = selDay?.year === calYear && selDay?.month === calMonth && selDay?.day === day;
+              const mark  = markedDays[day];
               return (
-                <View key={day} style={{ width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 2 }}>
+                <TouchableOpacity key={day} onPress={() => { setSelDay({ year: calYear, month: calMonth, day }); setShowAddTask(false); }}
+                  style={{ width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 1 }}>
                   <View style={{
                     width: '85%', aspectRatio: 1, borderRadius: 99, alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: isToday ? '#06b6d4' : hasDue ? '#ef444420' : 'transparent',
-                    borderWidth: hasDue && !isToday ? 1 : 0, borderColor: '#ef444460',
+                    backgroundColor: isSel ? '#06b6d4' : isTd ? '#06b6d420' : 'transparent',
+                    borderWidth: isTd && !isSel ? 1 : 0, borderColor: '#06b6d4',
                   }}>
-                    <Text style={{ color: isToday ? 'white' : isPast ? '#334155' : '#e2e8f0', fontSize: 13, fontWeight: isToday ? '700' : '400' }}>{day}</Text>
-                    {hasDue && !isToday && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#ef4444', marginTop: 1 }} />}
+                    <Text style={{ color: isSel ? 'white' : isTd ? '#06b6d4' : '#e2e8f0', fontSize: 13, fontWeight: isTd || isSel ? '700' : '400' }}>{day}</Text>
+                    {mark && (
+                      <View style={{ flexDirection: 'row', gap: 2, marginTop: 1 }}>
+                        {mark.todos > 0 && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: isSel ? 'white' : '#06b6d4' }} />}
+                        {mark.eq    > 0 && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: isSel ? 'white' : '#ef4444' }} />}
+                      </View>
+                    )}
                   </View>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
         </Card>
 
-        {/* Due this month */}
-        {Object.keys(dueDays).length > 0 && (
-          <Card style={{ borderColor: '#ef444430' }}>
-            <Text style={{ color: '#f87171', fontSize: 13, fontWeight: '700', marginBottom: 10 }}>🔔 Due this month</Text>
-            {Object.entries(dueDays).sort((a,b) => a[0]-b[0]).map(([day, names]) => (
-              <View key={day} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-                <View style={{ backgroundColor: '#ef444420', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, minWidth: 36, alignItems: 'center' }}>
-                  <Text style={{ color: '#f87171', fontSize: 12, fontWeight: '700' }}>{day}</Text>
-                </View>
-                <Text style={{ color: '#94a3b8', fontSize: 12, flex: 1 }}>{names.join(', ')}</Text>
-              </View>
-            ))}
-          </Card>
-        )}
+        {/* Legend */}
+        <View style={{ flexDirection: 'row', gap: 16, marginBottom: 14, paddingHorizontal: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#06b6d4' }} />
+            <Text style={{ color: '#64748b', fontSize: 11 }}>Task</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#ef4444' }} />
+            <Text style={{ color: '#64748b', fontSize: 11 }}>Equipment due</Text>
+          </View>
+        </View>
 
-        {/* Overdue now */}
-        {dueItems.length > 0 && (
-          <Card style={{ borderColor: '#f59e0b30' }}>
-            <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '700', marginBottom: 10 }}>⚠️ Overdue now</Text>
-            {dueItems.map(eq => {
-              const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
-              const days = last ? Math.floor((now - last) / 864e5) : null;
-              return (
-                <View key={eq.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, backgroundColor: '#1e293b', borderRadius: 10, padding: 10 }}>
+        {/* Selected day details */}
+        {selDay && (
+          <Card style={{ borderColor: '#06b6d430' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '700' }}>
+                {MONTH_NAMES[selDay.month]} {selDay.day}, {selDay.year}
+              </Text>
+              <TouchableOpacity onPress={() => setShowAddTask(!showAddTask)}
+                style={{ backgroundColor: '#06b6d4', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>+ Add Task</Text>
+              </TouchableOpacity>
+            </View>
+
+            {showAddTask && (
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                <TextInput value={newTaskText} onChangeText={setNewTaskText}
+                  placeholder="Task description..." placeholderTextColor="#475569"
+                  style={{ ...IS, flex: 1, marginBottom: 0 }}
+                  autoFocus onSubmitEditing={addTaskToDay} />
+                <TouchableOpacity onPress={addTaskToDay}
+                  style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}>
+                  <Text style={{ color: 'white', fontWeight: '700' }}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Equipment due on this day */}
+            {selDayEqDue.length > 0 && (<>
+              <Text style={{ color: '#f87171', fontSize: 11, fontWeight: '700', marginBottom: 6 }}>⚙️ EQUIPMENT DUE</Text>
+              {selDayEqDue.map(eq => (
+                <View key={eq.id} style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 6, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '600' }}>{eq.name}</Text>
-                    <Text style={{ color: '#64748b', fontSize: 11 }}>{days ? `${days} days since last` : 'Never maintained'}</Text>
+                    <Text style={{ color: '#64748b', fontSize: 11 }}>{eq.category}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => handleMaint(eq)} style={{ backgroundColor: '#10b98120', borderWidth: 1, borderColor: '#10b98140', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-                    <Text style={{ color: '#34d399', fontSize: 12, fontWeight: '600' }}>✓ Done</Text>
+                  <TouchableOpacity onPress={() => handleMaint(eq)} style={{ backgroundColor: '#10b98120', borderWidth: 1, borderColor: '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <Text style={{ color: '#34d399', fontSize: 12, fontWeight: '600' }}>{t.markDone || 'Done'}</Text>
                   </TouchableOpacity>
                 </View>
-              );
-            })}
+              ))}
+            </>)}
+
+            {/* Tasks on this day */}
+            {selDayTodos.length > 0 && (<>
+              <Text style={{ color: '#94a3b8', fontSize: 11, fontWeight: '700', marginBottom: 6, marginTop: selDayEqDue.length > 0 ? 8 : 0 }}>📋 TASKS</Text>
+              {selDayTodos.map(td => (
+                <View key={td.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 6 }}>
+                  <TouchableOpacity onPress={() => toggleTodo(td.id)}
+                    style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: td.done ? '#10b981' : '#334155', backgroundColor: td.done ? '#10b981' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                    {td.done && <Text style={{ color: 'white', fontSize: 11 }}>✓</Text>}
+                  </TouchableOpacity>
+                  <Text style={{ flex: 1, color: td.done ? '#475569' : '#e2e8f0', fontSize: 13, textDecorationLine: td.done ? 'line-through' : 'none' }}>{td.text}</Text>
+                  <TouchableOpacity onPress={() => deleteTodo(td.id)}>
+                    <Text style={{ color: '#334155', fontSize: 14 }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </>)}
+
+            {selDayTodos.length === 0 && selDayEqDue.length === 0 && (
+              <Text style={{ color: '#334155', fontSize: 13, textAlign: 'center', paddingVertical: 8 }}>No tasks for this day — tap "+ Add Task"</Text>
+            )}
           </Card>
         )}
       </>)}
 
-      {/* ══════ TO DO TAB ══════ */}
+      {/* ══════ TO DO — all tasks sorted by date ══════ */}
       {tab === 'todo' && (<>
 
-        {/* Equipment due — shown at top, separate from manual tasks */}
-        {eqTodayDue.length > 0 && (
-          <View style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#ef444430', marginBottom: 14 }}>
+        {/* Equipment overdue at top */}
+        {eqOverdue.length > 0 && (
+          <Card style={{ borderColor: '#ef444430', marginBottom: 14 }}>
             <Text style={{ color: '#f87171', fontSize: 12, fontWeight: '700', marginBottom: 10 }}>⚙️ {t.equipmentDue || 'EQUIPMENT DUE'}</Text>
-            {eqTodayDue.map(eq => {
+            {eqOverdue.map(eq => {
               const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
               const days = last ? Math.floor((now - last) / 864e5) : null;
               return (
-                <View key={eq.id} style={{ borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, backgroundColor: '#0a1628', borderLeftWidth: 3, borderLeftColor: '#ef4444' }}>
+                <View key={eq.id} style={{ backgroundColor: '#0a1628', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#1e293b', borderLeftWidth: 3, borderLeftColor: '#ef4444', marginBottom: 8 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1, marginRight: 10 }}>
                       <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '700' }}>{eq.name}</Text>
@@ -286,58 +353,65 @@ export default function EquipmentScreen({ navigation }) {
                 </View>
               );
             })}
-          </View>
+          </Card>
         )}
 
-        {/* Manual tasks header + add button */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '700' }}>📋 {t.todaysTasks || "TODAY'S TASKS"}</Text>
-          <TouchableOpacity onPress={() => setShowTodoInput(!showTodoInput)}
-            style={{ backgroundColor: showTodoInput ? '#1e293b' : '#06b6d4', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-            <Text style={{ color: showTodoInput ? '#64748b' : 'white', fontSize: 12, fontWeight: '600' }}>
-              {showTodoInput ? '✕' : '+ Add'}
-            </Text>
+        {/* All tasks sorted by date */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '700' }}>📋 ALL TASKS ({allSortedTodos.length})</Text>
+          <TouchableOpacity onPress={() => setTab('calendar')}
+            style={{ backgroundColor: '#06b6d420', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: '#06b6d440' }}>
+            <Text style={{ color: '#06b6d4', fontSize: 11, fontWeight: '600' }}>+ Add via Calendar</Text>
           </TouchableOpacity>
         </View>
 
-        {showTodoInput && (
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-            <TextInput value={newTodo} onChangeText={setNewTodo}
-              placeholder={t.addTask || '+ Add task for today...'}
-              placeholderTextColor="#475569"
-              style={{ ...IS, flex: 1, marginBottom: 0 }}
-              autoFocus onSubmitEditing={addManualTodo} />
-            <TouchableOpacity onPress={addManualTodo}
-              style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}>
-              <Text style={{ color: 'white', fontWeight: '700' }}>Add</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Manual todos list */}
-        {todayTodos.map(td => (
-          <View key={td.id} style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <TouchableOpacity onPress={() => toggleTodo(td.id)}
-              style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: td.done ? '#10b981' : '#334155', backgroundColor: td.done ? '#10b981' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-              {td.done && <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>✓</Text>}
-            </TouchableOpacity>
-            <Text style={{ flex: 1, color: td.done ? '#475569' : '#e2e8f0', fontSize: 14, textDecorationLine: td.done ? 'line-through' : 'none' }}>{td.text}</Text>
-            <TouchableOpacity onPress={() => deleteTodo(td.id)}>
-              <Text style={{ color: '#334155', fontSize: 16 }}>✕</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-
-        {eqTodayDue.length === 0 && todayTodos.length === 0 && (
+        {allSortedTodos.length === 0 && eqOverdue.length === 0 ? (
           <View style={{ alignItems: 'center', padding: 40 }}>
             <Text style={{ fontSize: 44 }}>✅</Text>
             <Text style={{ color: '#10b981', fontSize: 16, fontWeight: '700', marginTop: 12 }}>{t.allDone || 'All done!'}</Text>
-            <Text style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>{t.nothingDueToday || 'Nothing due today'}</Text>
+            <Text style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>No upcoming tasks</Text>
           </View>
+        ) : (
+          // Group by date
+          (() => {
+            const groups = {};
+            allSortedTodos.forEach(td => {
+              const key = td.date || 'No date';
+              if (!groups[key]) groups[key] = [];
+              groups[key].push(td);
+            });
+            return Object.entries(groups).map(([dateKey, items]) => {
+              const d = dateKey !== 'No date' ? new Date(dateKey) : null;
+              const isPast = d && d < today && dateKey !== today.toISOString().split('T')[0];
+              const isToday2 = dateKey === today.toISOString().split('T')[0];
+              return (
+                <View key={dateKey} style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <Text style={{ color: isToday2 ? '#06b6d4' : isPast ? '#ef4444' : '#94a3b8', fontSize: 12, fontWeight: '700' }}>
+                      {isToday2 ? '📅 TODAY' : d ? `📅 ${d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : '📋 No date'}
+                    </Text>
+                    {isPast && <Text style={{ color: '#ef444480', fontSize: 10 }}>overdue</Text>}
+                  </View>
+                  {items.map(td => (
+                    <View key={td.id} style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: isPast && !td.done ? '#ef444430' : '#1e293b', marginBottom: 6, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <TouchableOpacity onPress={() => toggleTodo(td.id)}
+                        style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: td.done ? '#10b981' : '#334155', backgroundColor: td.done ? '#10b981' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+                        {td.done && <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                      </TouchableOpacity>
+                      <Text style={{ flex: 1, color: td.done ? '#475569' : '#e2e8f0', fontSize: 14, textDecorationLine: td.done ? 'line-through' : 'none' }}>{td.text}</Text>
+                      <TouchableOpacity onPress={() => deleteTodo(td.id)}>
+                        <Text style={{ color: '#334155', fontSize: 16 }}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              );
+            });
+          })()
         )}
       </>)}
 
-      {/* ══════ EQUIPMENT TAB ══════ */}
+      {/* ══════ EQUIPMENT ══════ */}
       {tab === 'equipment' && (<>
         {myEq.length === 0
           ? <Card><Text style={{ color: '#64748b', fontSize: 14, textAlign: 'center', padding: 20 }}>{t.noEquipment}</Text></Card>
@@ -374,7 +448,7 @@ export default function EquipmentScreen({ navigation }) {
         }
       </>)}
 
-      {/* ══════ CATALOG TAB ══════ */}
+      {/* ══════ CATALOG ══════ */}
       {tab === 'catalog' && (<>
         {!selCat ? EQUIPMENT_DATABASE.categories.map(cat => (
           <TouchableOpacity key={cat.name} onPress={() => setSelCat(cat.name)}
@@ -392,7 +466,7 @@ export default function EquipmentScreen({ navigation }) {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{item.name}</Text>
-                  <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{item.size} · {item.price}</Text>
+                  <Text style={{ color: '#64748b', fontSize: 10 }}>{item.size} · {item.price}</Text>
                   <Text style={{ color: '#94a3b8', fontSize: 11, marginTop: 4 }}>{item.notes}</Text>
                 </View>
                 <TouchableOpacity onPress={() => handleAddDB(selCat, item)} style={{ backgroundColor: '#10b98120', borderWidth: 1, borderColor: '#10b98140', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 }}>
@@ -404,7 +478,7 @@ export default function EquipmentScreen({ navigation }) {
         </>)}
       </>)}
 
-      {/* ══════ CUSTOM / ADD TAB ══════ */}
+      {/* ══════ CUSTOM ADD ══════ */}
       {tab === 'custom' && (
         <Card>
           <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '600', marginBottom: 12 }}>{t.customEquipment}</Text>
@@ -433,12 +507,9 @@ export default function EquipmentScreen({ navigation }) {
       <Modal visible={showReminderModal} transparent animationType="fade">
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={{ backgroundColor: '#0f172a', borderRadius: 20, padding: 24, width: '100%', borderWidth: 1, borderColor: '#1e293b' }}>
-            <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700', marginBottom: 6 }}>{t.setMaintenanceReminder || '🔔 Set Maintenance Reminder'}</Text>
-            <Text style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>
-              {pendingEq?.name} — how often should we remind you?
-            </Text>
+            <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700', marginBottom: 6 }}>🔔 {t.setMaintenanceReminder || 'Set Maintenance Reminder'}</Text>
+            <Text style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>{pendingEq?.name}</Text>
             <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>{t.everyHowManyDays || 'Every how many days?'}</Text>
-            {/* Quick presets */}
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
               {['7','14','30','60','90'].map(d => (
                 <TouchableOpacity key={d} onPress={() => setReminderDays(d)}
@@ -448,7 +519,7 @@ export default function EquipmentScreen({ navigation }) {
               ))}
             </View>
             <TextInput keyboardType="number-pad" value={reminderDays} onChangeText={setReminderDays}
-              style={{ ...IS, marginBottom: 16 }} placeholder="Custom days" />
+              style={{ ...IS, marginBottom: 16 }} placeholder="Custom days" placeholderTextColor="#475569" />
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity onPress={() => { setShowReminderModal(false); setPendingEq(null); }}
                 style={{ flex: 1, backgroundColor: '#1e293b', borderRadius: 12, padding: 14, alignItems: 'center' }}>

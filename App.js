@@ -104,7 +104,7 @@ function AppContent() {
             tabBarIcon: ({ focused }) => {
               const icons = {
                 Dashboard: '📊', Params: '🧪', Diagnostic: '🩺',
-                Corals: '🪸', Aquarium: '🐠', Equipment: '⚙️',
+                Corals: '🪸', Aquarium: '🐠', Equipment: '🔧',
               };
               return (
                 <View style={{
@@ -132,7 +132,7 @@ function AppContent() {
           <Tab.Screen name="Diagnostic" component={DiagnosticsScreen} options={{ tabBarLabel: t.diagnostic }} />
           <Tab.Screen name="Corals" component={CoralsScreen} options={{ tabBarLabel: t.corals }} />
           <Tab.Screen name="Aquarium" component={LivestockScreen} options={{ tabBarLabel: t.aquarium }} />
-          <Tab.Screen name="Equipment" component={EquipmentScreen} options={{ tabBarLabel: t.equipment }} />
+          <Tab.Screen name="Equipment" component={EquipmentScreen} options={{ tabBarLabel: t.maintenance || 'Maintenance' }} />
         </Tab.Navigator>
       </NavigationContainer>
     </View>
