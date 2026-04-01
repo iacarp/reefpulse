@@ -27,11 +27,14 @@ export default function DashboardScreen({ navigation }) {
   const load = async () => {
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
-    // Load today's todos
+    // Load today's todos sorted by time
     try {
       const td = await AsyncStorage.getItem('todos');
       const allTodos = td ? JSON.parse(td) : [];
-      setTodayTodos(allTodos.filter(t => !t.done && (!t.date || t.date === todayStr)));
+      const todays = allTodos
+        .filter(t => !t.done && t.date === todayStr)
+        .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+      setTodayTodos(todays);
     } catch {}
     // Load due equipment
     try {
@@ -182,27 +185,39 @@ export default function DashboardScreen({ navigation }) {
 
 
 
-      {/* Today's To Do */}
+      {/* Today's To Do — full list */}
       {(todayTodos.length > 0 || todayDueEq.length > 0) && (
-        <TouchableOpacity onPress={() => navigation.navigate('Equipment')}
-          style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#06b6d430', marginTop: 12 }}>
-          <Text style={{ color: '#06b6d4', fontSize: 13, fontWeight: '700', marginBottom: 10 }}>✅ Today's To Do</Text>
-          {todayDueEq.slice(0,3).map(eq => (
-            <View key={eq.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#ef4444' }} />
-              <Text style={{ color: '#fca5a5', fontSize: 13 }}>⚙️ {eq.name} — maintenance due</Text>
+        <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#06b6d430', marginTop: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '700' }}>✅ {t.todayTodo || "Today's To Do"}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Equipment')}
+              style={{ backgroundColor: '#06b6d420', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: '#06b6d440' }}>
+              <Text style={{ color: '#06b6d4', fontSize: 10, fontWeight: '600' }}>See all →</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Equipment due today */}
+          {todayDueEq.map(eq => (
+            <View key={eq.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 6, borderLeftWidth: 3, borderLeftColor: '#ef4444' }}>
+              <Text style={{ fontSize: 16 }}>⚙️</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#fca5a5', fontSize: 13, fontWeight: '600' }}>{eq.name}</Text>
+                <Text style={{ color: '#64748b', fontSize: 11 }}>Maintenance due</Text>
+              </View>
             </View>
           ))}
-          {todayTodos.slice(0,3).map(td => (
-            <View key={td.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#06b6d4' }} />
-              <Text style={{ color: '#94a3b8', fontSize: 13 }}>{td.text}</Text>
+
+          {/* Today's tasks sorted by time */}
+          {todayTodos.map(td => (
+            <View key={td.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 6 }}>
+              {td.time
+                ? <Text style={{ color: '#06b6d4', fontSize: 12, fontWeight: '700', minWidth: 36 }}>{td.time}</Text>
+                : <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#06b6d4', marginLeft: 2 }} />
+              }
+              <Text style={{ flex: 1, color: '#e2e8f0', fontSize: 13 }}>{td.text}</Text>
             </View>
           ))}
-          {(todayTodos.length + todayDueEq.length) > 3 && (
-            <Text style={{ color: '#475569', fontSize: 11, marginTop: 4 }}>+{todayTodos.length + todayDueEq.length - 3} more → tap to see all</Text>
-          )}
-        </TouchableOpacity>
+        </View>
       )}
     </ScrollView>
   );

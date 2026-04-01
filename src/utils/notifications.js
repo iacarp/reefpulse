@@ -71,3 +71,21 @@ export async function getScheduledNotifications() {
   if (IS_WEB) return [];
   try { const N = require('expo-notifications'); return await N.getAllScheduledNotificationsAsync(); } catch { return []; }
 }
+
+export async function scheduleTaskReminder(taskText, date, hour, minute = 0) {
+  if (IS_WEB) return 'web';
+  try {
+    const N = require('expo-notifications');
+    const trigger = new Date(date);
+    trigger.setHours(hour, minute, 0, 0);
+    if (trigger <= new Date()) return null; // past
+    return await N.scheduleNotificationAsync({
+      content: {
+        title: '📋 Task Reminder',
+        body: taskText,
+        sound: true,
+      },
+      trigger,
+    });
+  } catch { return null; }
+}

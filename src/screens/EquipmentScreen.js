@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getMyEquipment, addEquipment, removeEquipment, logMaintenance } from '../utils/database';
 import { EQUIPMENT_DATABASE } from '../data/livestock';
 import { useI18n } from '../utils/i18n';
+import { scheduleTaskReminder } from '../utils/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IS = { backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 10, padding: 10, color: '#e2e8f0', fontSize: 16, marginBottom: 10 };
@@ -30,6 +31,8 @@ export default function EquipmentScreen({ navigation }) {
   const [selDay, setSelDay]     = useState(null); // {year, month, day}
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTaskText, setNewTaskText] = useState('');
+  const [newTaskHour, setNewTaskHour] = useState('09');
+  const [newTaskMin, setNewTaskMin]   = useState('00');
 
   // Reminder modal
   const [showReminderModal, setShowReminderModal] = useState(false);
@@ -104,8 +107,15 @@ export default function EquipmentScreen({ navigation }) {
   // Add task to selected day
   const addTaskToDay = async () => {
     if (!newTaskText.trim() || !selDayStr) return;
-    const updated = [...todos, { id: Date.now(), text: newTaskText.trim(), done: false, date: selDayStr }];
-    await saveTodos(updated); setTodos(updated); setNewTaskText(''); setShowAddTask(false);
+    const hour = parseInt(newTaskHour) || 9;
+    const min  = parseInt(newTaskMin)  || 0;
+    const timeStr = `${String(hour).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+    const entry = { id: Date.now(), text: newTaskText.trim(), done: false, date: selDayStr, time: timeStr };
+    // Schedule push notification
+    await scheduleTaskReminder(newTaskText.trim(), selDayStr, hour, min);
+    const updated = [...todos, entry];
+    await saveTodos(updated); setTodos(updated);
+    setNewTaskText(''); setNewTaskHour('09'); setNewTaskMin('00'); setShowAddTask(false);
   };
 
   const toggleTodo = async (id) => {
@@ -272,14 +282,24 @@ export default function EquipmentScreen({ navigation }) {
             </View>
 
             {showAddTask && (
-              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+              <View style={{ marginBottom: 12 }}>
                 <TextInput value={newTaskText} onChangeText={setNewTaskText}
                   placeholder="Task description..." placeholderTextColor="#475569"
-                  style={{ ...IS, flex: 1, marginBottom: 0 }}
-                  autoFocus onSubmitEditing={addTaskToDay} />
+                  style={{ ...IS }} autoFocus />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <Text style={{ color: '#64748b', fontSize: 12 }}>⏰ Time:</Text>
+                  <TextInput value={newTaskHour} onChangeText={v => setNewTaskHour(v.replace(/[^0-9]/g,'').slice(0,2))}
+                    keyboardType="number-pad" placeholder="09" placeholderTextColor="#475569" maxLength={2}
+                    style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 8, padding: 8, color: '#e2e8f0', fontSize: 16, width: 50, textAlign: 'center' }} />
+                  <Text style={{ color: '#64748b', fontSize: 18, fontWeight: '700' }}>:</Text>
+                  <TextInput value={newTaskMin} onChangeText={v => setNewTaskMin(v.replace(/[^0-9]/g,'').slice(0,2))}
+                    keyboardType="number-pad" placeholder="00" placeholderTextColor="#475569" maxLength={2}
+                    style={{ backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 8, padding: 8, color: '#e2e8f0', fontSize: 16, width: 50, textAlign: 'center' }} />
+                  <Text style={{ color: '#475569', fontSize: 11, flex: 1 }}>notification will be sent at this time</Text>
+                </View>
                 <TouchableOpacity onPress={addTaskToDay}
-                  style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}>
-                  <Text style={{ color: 'white', fontWeight: '700' }}>Add</Text>
+                  style={{ backgroundColor: '#06b6d4', borderRadius: 10, padding: 12, alignItems: 'center' }}>
+                  <Text style={{ color: 'white', fontWeight: '700', fontSize: 14 }}>Add Task + Set Reminder</Text>
                 </TouchableOpacity>
               </View>
             )}
