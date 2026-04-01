@@ -151,16 +151,16 @@ export default function EquipmentScreen({ navigation }) {
   const dayLetters = ['S','M','T','W','T','F','S'];
 
   const stabs = [
-    { id: 'calendar', icon: '📅', label: 'Calendar' },
-    { id: 'todo',     icon: '✅', label: 'To Do' },
-    { id: 'equipment',icon: '⚙️', label: t.myEquipment || 'Equipment' },
+    { id: 'calendar', icon: '📅', label: t.calendarTab || 'Calendar' },
+    { id: 'todo',     icon: '✅', label: t.todoTab || 'To Do' },
+    { id: 'equipment',icon: '⚙️', label: t.equipmentTab || 'Equipment' },
     { id: 'catalog',  icon: '📋', label: t.catalog || 'Catalog' },
     { id: 'custom',   icon: '➕', label: t.custom || 'Add' },
   ];
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#020617' }} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 100 }}>
-      <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 12 }}>🔧 Maintenance</Text>
+      <Text style={{ color: '#e2e8f0', fontSize: 20, fontWeight: '700', marginBottom: 12 }}>{t.maintenanceTitle || '🔧 Maintenance'}</Text>
 
       {/* Sub-tabs */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
@@ -259,64 +259,80 @@ export default function EquipmentScreen({ navigation }) {
 
       {/* ══════ TO DO TAB ══════ */}
       {tab === 'todo' && (<>
-        {/* Add todo */}
-        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
-          {showTodoInput ? (<>
-            <TextInput value={newTodo} onChangeText={setNewTodo} placeholder="New task..." placeholderTextColor="#475569"
-              style={{ ...IS, flex: 1, marginBottom: 0 }} autoFocus onSubmitEditing={addManualTodo} />
-            <TouchableOpacity onPress={addManualTodo} style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}>
-              <Text style={{ color: 'white', fontWeight: '700' }}>Add</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setShowTodoInput(false); setNewTodo(''); }} style={{ backgroundColor: '#1e293b', borderRadius: 10, paddingHorizontal: 10, justifyContent: 'center' }}>
-              <Text style={{ color: '#64748b' }}>✕</Text>
-            </TouchableOpacity>
-          </>) : (
-            <TouchableOpacity onPress={() => setShowTodoInput(true)}
-              style={{ flex: 1, backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', borderRadius: 10, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ color: '#475569', fontSize: 14 }}>+ Add task for today...</Text>
-            </TouchableOpacity>
-          )}
+
+        {/* Equipment due — shown at top, separate from manual tasks */}
+        {eqTodayDue.length > 0 && (
+          <View style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#ef444430', marginBottom: 14 }}>
+            <Text style={{ color: '#f87171', fontSize: 12, fontWeight: '700', marginBottom: 10 }}>⚙️ {t.equipmentDue || 'EQUIPMENT DUE'}</Text>
+            {eqTodayDue.map(eq => {
+              const last = eq.last_maintenance ? new Date(eq.last_maintenance) : null;
+              const days = last ? Math.floor((now - last) / 864e5) : null;
+              return (
+                <View key={eq.id} style={{ borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, backgroundColor: '#0a1628', borderLeftWidth: 3, borderLeftColor: '#ef4444' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <View style={{ flex: 1, marginRight: 10 }}>
+                      <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '700' }}>{eq.name}</Text>
+                      <Text style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>{eq.category}{eq.brand ? ` · ${eq.brand}` : ''}</Text>
+                      {eq.notes ? <Text style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{eq.notes}</Text> : null}
+                      <Text style={{ color: '#f87171', fontSize: 11, marginTop: 4 }}>
+                        {days === null ? (t.neverMaintained || 'Never maintained') : `${days} ${t.daysSinceLast || 'days since last'}`}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handleMaint(eq)}
+                      style={{ backgroundColor: '#10b98120', borderWidth: 1, borderColor: '#10b98140', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+                      <Text style={{ color: '#34d399', fontSize: 13, fontWeight: '700' }}>{t.markDone || 'Done'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Manual tasks header + add button */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '700' }}>📋 {t.todaysTasks || "TODAY'S TASKS"}</Text>
+          <TouchableOpacity onPress={() => setShowTodoInput(!showTodoInput)}
+            style={{ backgroundColor: showTodoInput ? '#1e293b' : '#06b6d4', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+            <Text style={{ color: showTodoInput ? '#64748b' : 'white', fontSize: 12, fontWeight: '600' }}>
+              {showTodoInput ? '✕' : '+ Add'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Equipment due today */}
-        {eqTodayDue.length > 0 && (<>
-          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>⚙️ EQUIPMENT DUE</Text>
-          {eqTodayDue.map(eq => (
-            <View key={eq.id} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#ef444430', borderLeftWidth: 3, borderLeftColor: '#ef4444', marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{eq.name}</Text>
-                <Text style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>{eq.category}{eq.notes ? ` · ${eq.notes}` : ''}</Text>
-                <Text style={{ color: '#f87171', fontSize: 11, marginTop: 4 }}>Maintenance required</Text>
-              </View>
-              <TouchableOpacity onPress={() => handleMaint(eq)} style={{ backgroundColor: '#10b98120', borderWidth: 1, borderColor: '#10b98140', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 }}>
-                <Text style={{ color: '#34d399', fontSize: 13, fontWeight: '700' }}>✓</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </>)}
+        {showTodoInput && (
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            <TextInput value={newTodo} onChangeText={setNewTodo}
+              placeholder={t.addTask || '+ Add task for today...'}
+              placeholderTextColor="#475569"
+              style={{ ...IS, flex: 1, marginBottom: 0 }}
+              autoFocus onSubmitEditing={addManualTodo} />
+            <TouchableOpacity onPress={addManualTodo}
+              style={{ backgroundColor: '#06b6d4', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}>
+              <Text style={{ color: 'white', fontWeight: '700' }}>Add</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
-        {/* Manual todos */}
-        {todayTodos.length > 0 && (<>
-          <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8, marginTop: 4 }}>📋 TODAY'S TASKS</Text>
-          {todayTodos.map(td => (
-            <View key={td.id} style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <TouchableOpacity onPress={() => toggleTodo(td.id)}
-                style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: td.done ? '#10b981' : '#334155', backgroundColor: td.done ? '#10b981' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-                {td.done && <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>✓</Text>}
-              </TouchableOpacity>
-              <Text style={{ flex: 1, color: td.done ? '#475569' : '#e2e8f0', fontSize: 14, textDecorationLine: td.done ? 'line-through' : 'none' }}>{td.text}</Text>
-              <TouchableOpacity onPress={() => deleteTodo(td.id)}>
-                <Text style={{ color: '#334155', fontSize: 14 }}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </>)}
+        {/* Manual todos list */}
+        {todayTodos.map(td => (
+          <View key={td.id} style={{ backgroundColor: '#0f172a', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <TouchableOpacity onPress={() => toggleTodo(td.id)}
+              style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: td.done ? '#10b981' : '#334155', backgroundColor: td.done ? '#10b981' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+              {td.done && <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>✓</Text>}
+            </TouchableOpacity>
+            <Text style={{ flex: 1, color: td.done ? '#475569' : '#e2e8f0', fontSize: 14, textDecorationLine: td.done ? 'line-through' : 'none' }}>{td.text}</Text>
+            <TouchableOpacity onPress={() => deleteTodo(td.id)}>
+              <Text style={{ color: '#334155', fontSize: 16 }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
 
         {eqTodayDue.length === 0 && todayTodos.length === 0 && (
           <View style={{ alignItems: 'center', padding: 40 }}>
-            <Text style={{ fontSize: 40 }}>✅</Text>
-            <Text style={{ color: '#10b981', fontSize: 16, fontWeight: '700', marginTop: 12 }}>All done!</Text>
-            <Text style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>Nothing due today</Text>
+            <Text style={{ fontSize: 44 }}>✅</Text>
+            <Text style={{ color: '#10b981', fontSize: 16, fontWeight: '700', marginTop: 12 }}>{t.allDone || 'All done!'}</Text>
+            <Text style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>{t.nothingDueToday || 'Nothing due today'}</Text>
           </View>
         )}
       </>)}
@@ -417,11 +433,11 @@ export default function EquipmentScreen({ navigation }) {
       <Modal visible={showReminderModal} transparent animationType="fade">
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={{ backgroundColor: '#0f172a', borderRadius: 20, padding: 24, width: '100%', borderWidth: 1, borderColor: '#1e293b' }}>
-            <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700', marginBottom: 6 }}>🔔 Set Maintenance Reminder</Text>
+            <Text style={{ color: '#e2e8f0', fontSize: 17, fontWeight: '700', marginBottom: 6 }}>{t.setMaintenanceReminder || '🔔 Set Maintenance Reminder'}</Text>
             <Text style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>
               {pendingEq?.name} — how often should we remind you?
             </Text>
-            <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>Every how many days?</Text>
+            <Text style={{ color: '#94a3b8', fontSize: 12, fontWeight: '600', marginBottom: 8 }}>{t.everyHowManyDays || 'Every how many days?'}</Text>
             {/* Quick presets */}
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
               {['7','14','30','60','90'].map(d => (
@@ -436,11 +452,11 @@ export default function EquipmentScreen({ navigation }) {
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity onPress={() => { setShowReminderModal(false); setPendingEq(null); }}
                 style={{ flex: 1, backgroundColor: '#1e293b', borderRadius: 12, padding: 14, alignItems: 'center' }}>
-                <Text style={{ color: '#64748b', fontSize: 14 }}>Skip</Text>
+                <Text style={{ color: '#64748b', fontSize: 14 }}>{t.skip || 'Skip'}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={saveReminderDays}
                 style={{ flex: 2, backgroundColor: '#06b6d4', borderRadius: 12, padding: 14, alignItems: 'center' }}>
-                <Text style={{ color: 'white', fontSize: 14, fontWeight: '700' }}>Set Reminder</Text>
+                <Text style={{ color: 'white', fontSize: 14, fontWeight: '700' }}>{t.setReminder2 || 'Set Reminder'}</Text>
               </TouchableOpacity>
             </View>
           </View>

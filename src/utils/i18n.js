@@ -81,6 +81,10 @@ const T = {
     qtGentle: 'Gentle QT (Sensitive Fish)', qtObservation: 'Observation Only',
     copperPower: 'Copper Power', prazipro: 'PraziPro', formalin: 'Formalin 37%',
     nitrofurazone: 'Nitrofurazone',
+    // Maintenance
+    maintenance: 'Mantenimiento', maintenanceTitle: '🔧 Mantenimiento', calendarTab: 'Calendario', todoTab: 'Tareas', equipmentTab: 'Equipos', dueThisMonth: 'Pendiente este mes', overdueNow: 'Atrasado', markDone: '✓ Hecho', nothingDueToday: 'Nada pendiente hoy', allDone: '¡Todo listo!', addTask: '+ Añadir tarea de hoy...', equipmentDue: 'EQUIPOS PENDIENTES', todaysTasks: 'TAREAS DE HOY', setMaintenanceReminder: 'Configurar recordatorio', reminderQuestion: '¿Cada cuántos días?', everyHowManyDays: '¿Cada cuántos días?', setReminder2: 'Configurar', skip: 'Omitir', maintenanceRequired: 'Mantenimiento requerido', daysSinceLast: 'días desde el último', neverMaintained: 'Nunca mantenido', todayTodo: 'Tareas de hoy', tapToSeeAll: 'más → toca para ver todo',
+    // Maintenance
+    maintenance: 'Mentenanță', maintenanceTitle: '🔧 Mentenanță', calendarTab: 'Calendar', todoTab: 'To Do', equipmentTab: 'Echipamente', dueThisMonth: 'Scadente luna aceasta', overdueNow: 'Depășite acum', markDone: '✓ Gata', nothingDueToday: 'Nimic scadent azi', allDone: 'Totul gata!', addTask: '+ Adaugă task pentru azi...', equipmentDue: 'ECHIPAMENTE SCADENTE', todaysTasks: 'TASKURI AZI', setMaintenanceReminder: 'Setează Reminder Mentenanță', reminderQuestion: 'La câte zile să îți amintim?', everyHowManyDays: 'La câte zile?', setReminder2: 'Setează Reminder', skip: 'Sari peste', maintenanceRequired: 'Mentenanță necesară', daysSinceLast: 'zile de la ultima', neverMaintained: 'Niciodată întreținut', todayTodo: 'To Do Azi', tapToSeeAll: 'mai multe → apasă pentru toate',
     // Dosing Calculator
     dosingCalc: '🧮 Dosing Calculator', netVolLabel: 'Net volume:', setVolFirst: 'Set net volume →', volOk: 'OK',
     calcTab: '🧪 Calculator', logTab: '📋 Log',
@@ -105,6 +109,8 @@ const T = {
     errFillLog: 'Fill in product and quantity',
     valuesFromTests: '↑ Values from last recorded tests',
     netVolumePlaceholder: 'Net volume (L)',
+    // Maintenance
+    maintenance: 'Maintenance', maintenanceTitle: '🔧 Maintenance', calendarTab: 'Calendar', todoTab: 'To Do', equipmentTab: 'Equipment', dueThisMonth: 'Due this month', overdueNow: 'Overdue now', markDone: 'Done', nothingDueToday: 'Nothing due today', allDone: 'All done!', addTask: '+ Add task for today...', setMaintenanceReminder: 'Set Maintenance Reminder', everyHowManyDays: 'Every how many days?', setReminder2: 'Set Reminder', skip: 'Skip', maintenanceRequired: 'Maintenance required', daysSinceLast: 'days since last', neverMaintained: 'Never maintained', todayTodo: "Today's To Do", tapToSeeAll: 'more, tap to see all',
   },
   ro: {
     dashboard: 'Acasă', params: 'Parametri', diagnostic: 'Diagnostic',
@@ -198,6 +204,8 @@ const T = {
     errFillLog: 'Completează produsul și cantitatea',
     valuesFromTests: '↑ Valori din ultimele teste înregistrate',
     netVolumePlaceholder: 'Volum net (L)',
+    // Maintenance
+    maintenance: 'Mentenanță', maintenanceTitle: '🔧 Mentenanță', calendarTab: 'Calendar', todoTab: 'To Do', equipmentTab: 'Echipamente', dueThisMonth: 'Scadente luna aceasta', overdueNow: 'Depășite acum', markDone: 'Gata', nothingDueToday: 'Nimic scadent azi', allDone: 'Totul gata!', addTask: '+ Adaugă task pentru azi...', setMaintenanceReminder: 'Setează Reminder', everyHowManyDays: 'La câte zile?', setReminder2: 'Setează', skip: 'Sari peste', maintenanceRequired: 'Mentenanță necesară', daysSinceLast: 'zile de la ultima', neverMaintained: 'Niciodată întreținut', todayTodo: 'To Do Azi', tapToSeeAll: 'mai multe, apasă pentru toate',
   },
   fr: {
     dashboard: 'Accueil', params: 'Paramètres', diagnostic: 'Diagnostic',
