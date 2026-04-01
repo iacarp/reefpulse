@@ -368,7 +368,27 @@ export default function ClownfishSplash({ onFinish }) {
     return () => { cancelAnimationFrame(animId); clearTimeout(timer); };
   }, []);
 
-  if (Platform.OS !== 'web') return null;
+  // Native: simple animated splash (canvas not available)
+  if (Platform.OS !== 'web') {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        {/* Animated background bubbles */}
+        <Animated.View style={{ position: 'absolute', inset: 0, backgroundColor: '#020c1a' }} />
+        <Animated.View style={[styles.overlay, { opacity: uiOpacity }]}>
+          <View style={styles.logoWrap}>
+            <Animated.View style={[styles.ring2, { transform: [{ scale: ring1Scale }] }]} />
+            <Animated.View style={[styles.ring3, { transform: [{ scale: ring2Scale }] }]} />
+            <Text style={styles.logoIcon}>🪸</Text>
+          </View>
+          <Text style={styles.brand}>ReefPulse</Text>
+          <Text style={styles.sub}>REEF INTELLIGENCE</Text>
+          <View style={styles.divider} />
+          <Text style={styles.tagline}>Track · Diagnose · Thrive</Text>
+          <Text style={{ fontSize: 48, marginTop: 40 }}>🐠</Text>
+        </Animated.View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

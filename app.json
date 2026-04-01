@@ -7,13 +7,19 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#020617",
     "primaryColor": "#06b6d4",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.reefpulse.app",
       "buildNumber": "1",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
+        "NSPhotoLibraryUsageDescription": "Allow ReefPulse to access your photos to upload your tank photo.",
+        "NSCameraUsageDescription": "Allow ReefPulse to use your camera to take a tank photo."
       }
     },
     "android": {
@@ -22,7 +28,14 @@
       "adaptiveIcon": {
         "backgroundColor": "#020617"
       },
-      "permissions": ["NOTIFICATIONS", "VIBRATE", "RECEIVE_BOOT_COMPLETED"]
+      "permissions": [
+        "NOTIFICATIONS",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro"
@@ -31,6 +44,23 @@
       "eas": {
         "projectId": "SET_AFTER_EAS_INIT"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ReefPulse to access your photos to upload your tank photo.",
+          "cameraPermission": "Allow ReefPulse to use your camera to take a tank photo."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#06b6d4",
+          "sounds": []
+        }
+      ]
+    ]
   }
 }

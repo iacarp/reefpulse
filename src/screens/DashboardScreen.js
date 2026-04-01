@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, Modal, Platform, Image, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getAllEntries, getMyLivestock } from '../utils/database';
 import { CORE_PARAMS, runDiagnostics } from '../data/parameters';
@@ -21,10 +21,12 @@ export default function DashboardScreen({ navigation }) {
   const [showLang, setShowLang] = useState(false);
   const [todayTodos, setTodayTodos] = useState([]);
   const [todayDueEq, setTodayDueEq] = useState([]);
+  const [tankPhoto, setTankPhoto] = useState(null);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
   const load = async () => {
+    try { const p = await AsyncStorage.getItem('tank_photo'); if (p) setTankPhoto(p); } catch {}
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
     // Load today's todos sorted by time
@@ -58,6 +60,55 @@ export default function DashboardScreen({ navigation }) {
   };
 
   useFocusEffect(useCallback(() => { load(); }, []));
+
+  const handlePickPhoto = async () => {
+    if (Platform.OS === 'web') {
+      // Web: use file input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          const dataUrl = ev.target.result;
+          setTankPhoto(dataUrl);
+          await AsyncStorage.setItem('tank_photo', dataUrl);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    } else {
+      // Native: use expo-image-picker
+      try {
+        const ImagePicker = require('expo-image-picker');
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission needed', 'Please allow access to your photo library.');
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [16, 9],
+          quality: 0.7,
+        });
+        if (!result.canceled && result.assets[0]) {
+          const uri = result.assets[0].uri;
+          setTankPhoto(uri);
+          await AsyncStorage.setItem('tank_photo', uri);
+        }
+      } catch (e) {
+        console.log('ImagePicker error:', e);
+      }
+    }
+  };
+
+  const removePhoto = async () => {
+    setTankPhoto(null);
+    await AsyncStorage.removeItem('tank_photo');
+  };
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
   const last = entries.length > 0 ? entries[entries.length - 1] : null;
@@ -101,6 +152,28 @@ export default function DashboardScreen({ navigation }) {
           </View>
         )}
       </View>
+
+      {/* Tank Photo */}
+      {tankPhoto ? (
+        <TouchableOpacity onPress={handlePickPhoto} style={{ marginBottom: 12, borderRadius: 16, overflow: 'hidden', position: 'relative' }}>
+          <Image source={{ uri: tankPhoto }} style={{ width: '100%', height: 200, borderRadius: 16 }} resizeMode="cover" />
+          <View style={{ position: 'absolute', bottom: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity onPress={handlePickPhoto}>
+              <Text style={{ color: 'white', fontSize: 11 }}>📷 Change</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={removePhoto}>
+              <Text style={{ color: '#f87171', fontSize: 11 }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={handlePickPhoto}
+          style={{ marginBottom: 12, borderRadius: 16, borderWidth: 1.5, borderColor: '#1e293b', borderStyle: 'dashed', padding: 24, alignItems: 'center', backgroundColor: '#0f172a' }}>
+          <Text style={{ fontSize: 32, marginBottom: 8 }}>📷</Text>
+          <Text style={{ color: '#94a3b8', fontSize: 14, fontWeight: '600' }}>Add your tank photo</Text>
+          <Text style={{ color: '#475569', fontSize: 12, marginTop: 4 }}>Tap to upload from gallery</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Latest Params */}
       {last ? (

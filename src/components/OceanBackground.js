@@ -106,7 +106,16 @@ export default function OceanBackground() {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  if (Platform.OS !== 'web') return null;
+  if (Platform.OS !== 'web') {
+    // Native: static dark ocean background (canvas not available)
+    return (
+      <View style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: -1, pointerEvents: 'none',
+        backgroundColor: '#020c1a',
+      }} />
+    );
+  }
 
   return (
     <canvas
