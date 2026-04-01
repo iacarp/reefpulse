@@ -104,15 +104,43 @@ function AppContent() {
             tabBarIcon: ({ focused }) => {
               const icons = {
                 Dashboard: '📊', Params: '🧪', Diagnostic: '🩺',
-                Corals: '🪸', Aquarium: '🐠', Equipment: '🔧',
+                Corals: '🪸', Equipment: '🔧',
               };
+              const isAquarium = route.name === 'Aquarium';
               return (
                 <View style={{
                   alignItems: 'center', justifyContent: 'center',
                   width: 36, height: 28, borderRadius: 8,
                   backgroundColor: focused ? 'rgba(6,182,212,0.12)' : 'transparent',
                 }}>
-                  <Text style={{ fontSize: 18, opacity: focused ? 1 : 0.4 }}>{icons[route.name]}</Text>
+                  {isAquarium ? (
+                    // Aquarium cube icon
+                    <View style={{ width: 22, height: 18, opacity: focused ? 1 : 0.4 }}>
+                      {/* Glass tank body */}
+                      <View style={{
+                        position: 'absolute', left: 1, top: 2,
+                        width: 20, height: 15,
+                        borderWidth: 1.5,
+                        borderColor: focused ? '#06b6d4' : '#475569',
+                        borderRadius: 2,
+                        backgroundColor: focused ? 'rgba(6,182,212,0.08)' : 'rgba(71,85,105,0.08)',
+                      }} />
+                      {/* Water fill */}
+                      <View style={{
+                        position: 'absolute', left: 2.5, top: 9,
+                        width: 17, height: 7,
+                        borderBottomLeftRadius: 1, borderBottomRightRadius: 1,
+                        backgroundColor: focused ? 'rgba(6,182,212,0.25)' : 'rgba(71,85,105,0.2)',
+                      }} />
+                      {/* Coral emoji inside */}
+                      <Text style={{
+                        position: 'absolute', left: 4, top: 3,
+                        fontSize: 8, lineHeight: 10,
+                      }}>🪸</Text>
+                    </View>
+                  ) : (
+                    <Text style={{ fontSize: 18, opacity: focused ? 1 : 0.4 }}>{icons[route.name]}</Text>
+                  )}
                 </View>
               );
             },
