@@ -104,7 +104,7 @@ function AppContent() {
             tabBarIcon: ({ focused }) => {
               const icons = {
                 Dashboard: '📊', Params: '🧪', Diagnostic: '🩺',
-                Corals: '🪸', Equipment: '🔧',
+                Corals: '🪸', Equipment: '🔧', Aquarium: '🐠',
               };
               const isAquarium = route.name === 'Aquarium';
               return (
@@ -157,9 +157,9 @@ function AppContent() {
         >
           <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ tabBarLabel: t.dashboard }} />
           <Tab.Screen name="Params" component={ParametersScreen} options={{ tabBarLabel: t.params }} />
-          <Tab.Screen name="Diagnostic" component={DiagnosticsScreen} options={{ tabBarLabel: t.diagnostic }} />
-          <Tab.Screen name="Corals" component={CoralsScreen} options={{ tabBarLabel: t.corals }} />
           <Tab.Screen name="Aquarium" component={LivestockScreen} options={{ tabBarLabel: t.aquarium }} />
+          <Tab.Screen name="Corals" component={CoralsScreen} options={{ tabBarLabel: t.corals }} />
+          <Tab.Screen name="Diagnostic" component={DiagnosticsScreen} options={{ tabBarLabel: t.diagnostic }} />
           <Tab.Screen name="Equipment" component={EquipmentScreen} options={{ tabBarLabel: t.maintenance || 'Maintenance' }} />
         </Tab.Navigator>
       </NavigationContainer>

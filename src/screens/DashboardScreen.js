@@ -56,7 +56,7 @@ export default function DashboardScreen({ navigation }) {
     const invertCount = livestock.filter(l => l.type === 'invert').reduce((s,l) => s + (l.qty||1), 0);
     const coralCount  = livestock.filter(l => l.type === 'coral').reduce((s,l) => s + (l.qty||1), 0);
     setEntries(ent); setLs({ corals: c, fish: f, inverts: i, fishCount, invertCount, coralCount });
-    setDiags(runDiagnostics(ent, CORE_PARAMS, c, f, i, CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE));
+    setDiags(runDiagnostics(ent, CORE_PARAMS, c, f, i, CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE, lang));
   };
 
   useFocusEffect(useCallback(() => { load(); }, []));

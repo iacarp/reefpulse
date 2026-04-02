@@ -8,7 +8,7 @@ import { FISH_DATABASE, INVERT_DATABASE } from '../data/livestock';
 import { useI18n } from '../utils/i18n';
 
 export default function DiagnosticsScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [diags, setDiags] = useState([]);
   const [alertS, setAlertS] = useState([]);
   const [entries, setEntries] = useState([]);
@@ -21,7 +21,7 @@ export default function DiagnosticsScreen() {
       ls.filter(l => l.type === 'coral').map(l => l.ref_id),
       ls.filter(l => l.type === 'fish').map(l => l.ref_id),
       ls.filter(l => l.type === 'invert').map(l => l.ref_id),
-      CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE));
+      CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE, lang));
     setAlertS(await getAlertSettings());
   };
 
@@ -71,7 +71,7 @@ export default function DiagnosticsScreen() {
                 <Text style={{ color, fontSize: 13, fontWeight: '600' }}>
                   {d.message || `${CORE_PARAMS[d.param]?.name || d.param}: ${d.value} ${CORE_PARAMS[d.param]?.unit || ''} — ${d.direction === 'low' ? t.low : t.high}`}
                 </Text>
-                {d.ideal && <Text style={{ color: '#64748b', fontSize: 11 }}>Ideal: {d.ideal[0]} – {d.ideal[1]} {CORE_PARAMS[d.param]?.unit || ''}</Text>}
+                {d.ideal && <Text style={{ color: '#64748b', fontSize: 11 }}>Ideal: {d.ideal[0]}–{d.ideal[1]} {CORE_PARAMS[d.param]?.unit || ''}</Text>}
               </View>
             </View>
             {d.causes?.length > 0 && <Sec title={t.possibleCauses} items={d.causes} color="#f59e0b" />}
