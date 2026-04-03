@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getAllEntries, addEntry, deleteEntry, getActiveExtraParams, toggleExtraParam } from '../utils/database';
 import { CORE_PARAMS, EXTRA_PARAMS } from '../data/parameters';
 import { useI18n } from '../utils/i18n';
+import { maybeShowAd } from '../components/AdModal';
 import DosingCalculator from '../components/DosingCalculator';
 
 const W = Dimensions.get('window').width;
@@ -128,7 +129,8 @@ function LineChart({ data, color, ideal, unit, label }) {
   );
 }
 
-export default function ParametersScreen({ navigation }) {
+export default function ParametersScreen({ navigation, route }) {
+  const showAdFn = route?.params?.showAd;
   const { t } = useI18n();
   const [tab, setTab]         = useState('params');
   const [entries, setEntries] = useState([]);
@@ -154,6 +156,7 @@ export default function ParametersScreen({ navigation }) {
     setForm({ date: new Date().toISOString().split('T')[0] });
     setShowAdd(false);
     await load();
+    if (showAdFn) await maybeShowAd(showAdFn);
   };
 
   const handleDelete = (id) => {

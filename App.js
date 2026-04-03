@@ -7,6 +7,7 @@ import { I18nProvider, useI18n } from './src/utils/i18n';
 import { getDatabase } from './src/utils/database';
 import { requestNotificationPermissions } from './src/utils/notifications';
 import ClownfishSplash from './src/components/ClownfishSplash';
+import AdModal, { maybeShowAd } from './src/components/AdModal';
 import OfflineBar from './src/components/OfflineBar';
 import OceanBackground from './src/components/OceanBackground';
 
@@ -63,6 +64,7 @@ function AppContent() {
   const { t } = useI18n();
   const [showSplash, setShowSplash] = useState(true);
   const [ready, setReady] = useState(false);
+  const [showAd, setShowAd] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -156,13 +158,14 @@ function AppContent() {
           })}
         >
           <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ tabBarLabel: t.dashboard }} />
-          <Tab.Screen name="Params" component={ParametersScreen} options={{ tabBarLabel: t.params }} />
+          <Tab.Screen name="Params" component={ParametersScreen} options={{ tabBarLabel: t.params }} initialParams={{ showAd: () => setShowAd(true) }} />
           <Tab.Screen name="Aquarium" component={LivestockScreen} options={{ tabBarLabel: t.aquarium }} />
           <Tab.Screen name="Corals" component={CoralsScreen} options={{ tabBarLabel: t.corals }} />
           <Tab.Screen name="Diagnostic" component={DiagnosticsScreen} options={{ tabBarLabel: t.diagnostic }} />
-          <Tab.Screen name="Equipment" component={EquipmentScreen} options={{ tabBarLabel: t.maintenance || 'Maintenance' }} />
+          <Tab.Screen name="Equipment" component={EquipmentScreen} options={{ tabBarLabel: t.maintenance || 'Maintenance' }} initialParams={{ showAd: () => setShowAd(true) }} />
         </Tab.Navigator>
       </NavigationContainer>
+      <AdModal visible={showAd} onClose={() => setShowAd(false)} />
     </View>
   );
 }

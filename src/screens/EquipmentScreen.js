@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getMyEquipment, addEquipment, removeEquipment, logMaintenance } from '../utils/database';
 import { EQUIPMENT_DATABASE } from '../data/livestock';
 import { useI18n } from '../utils/i18n';
+import { maybeShowAd } from '../components/AdModal';
 import { scheduleTaskReminder } from '../utils/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -16,7 +17,8 @@ const DAY_LETTERS = ['S','M','T','W','T','F','S'];
 async function getTodos() { try { const d = await AsyncStorage.getItem('todos'); return d ? JSON.parse(d) : []; } catch { return []; } }
 async function saveTodos(t) { await AsyncStorage.setItem('todos', JSON.stringify(t)); }
 
-export default function EquipmentScreen({ navigation }) {
+export default function EquipmentScreen({ navigation, route }) {
+  const showAdFn = route?.params?.showAd;
   const { t } = useI18n();
   const [tab, setTab] = useState('calendar');
   const [myEq, setMyEq] = useState([]);
@@ -158,6 +160,7 @@ export default function EquipmentScreen({ navigation }) {
 
   const handleMaint = async (eq) => {
     await logMaintenance(eq.id); await load();
+    if (showAdFn) await maybeShowAd(showAdFn);
   };
 
   const handleRemoveEq = (eq) => {
