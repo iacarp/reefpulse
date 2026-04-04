@@ -240,12 +240,12 @@ export default function DashboardScreen({ navigation }) {
             <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.coralCount ?? ls.corals.length}</Text>
             <Text style={{ color: '#64748b', fontSize: 10 }}>{t.coralsLabel}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish' })}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish', ts: Date.now() })}>
             <Text style={{ fontSize: 22 }}>🐟</Text>
             <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.fishCount ?? ls.fish.length}</Text>
             <Text style={{ color: '#64748b', fontSize: 10 }}>{t.fishLabel}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts' })}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts', ts: Date.now() })}>
             <Text style={{ fontSize: 22 }}>🦐</Text>
             <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.invertCount ?? ls.inverts.length}</Text>
             <Text style={{ color: '#64748b', fontSize: 10 }}>{t.invertsLabel}</Text>
@@ -264,7 +264,7 @@ export default function DashboardScreen({ navigation }) {
             {ls.fish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
               const qty = ls.qtyMap?.[id + '_fish'] || 1;
               return (
-                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish' })}
+                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish', ts: Date.now() })}
                   style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
                   <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
                   <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
@@ -282,7 +282,7 @@ export default function DashboardScreen({ navigation }) {
             {ls.inverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
               const qty = ls.qtyMap?.[id + '_invert'] || 1;
               return (
-                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts' })}
+                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts', ts: Date.now() })}
                   style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
                   <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
                   <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>

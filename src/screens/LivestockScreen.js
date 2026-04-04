@@ -12,6 +12,11 @@ export default function LivestockScreen({ navigation, route }) {
   const { t, lang } = useI18n();
   const DISEASES = getDiseases(lang);
   const [tab, setTab] = useState(route?.params?.initialTab || 'my');
+
+  // Update tab when navigation params change (e.g. from Dashboard)
+  React.useEffect(() => {
+    if (route?.params?.initialTab) setTab(route.params.initialTab);
+  }, [route?.params?.initialTab, route?.params?.ts]);
   const [myFish, setMyFish] = useState([]);
   const [myInverts, setMyInverts] = useState([]);
   const [myQty, setMyQty] = useState({});
