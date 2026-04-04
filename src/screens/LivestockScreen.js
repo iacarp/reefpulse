@@ -222,7 +222,7 @@ export default function LivestockScreen({ navigation, route }) {
       </>)}
 
       {tab === 'fish' && (<>
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', borderRadius: 12, paddingHorizontal: 12, marginBottom: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', borderRadius: 12, paddingHorizontal: 12, marginBottom: 12, minHeight: 44 }}>
           <Text style={{ color: '#475569', fontSize: 16, marginRight: 8 }}>🔍</Text>
           <TextInput value={search} onChangeText={setSearch} placeholder="Search fish..." placeholderTextColor="#334155"
             style={{ flex: 1, color: '#e2e8f0', fontSize: 14, paddingVertical: 10 }} />
@@ -349,8 +349,46 @@ function IB({ title, text, color }) { return <View style={{ marginTop: 8, backgr
 function LI({ title, sub, onPress, right }) { return <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 6 }}><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '500' }}>{title}</Text>{sub && <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{sub}</Text>}</View>{right}</TouchableOpacity>; }
 function Row({ children, between }) { return <View style={{ flexDirection: 'row', justifyContent: between ? 'space-between' : 'flex-start', marginBottom: 12 }}>{children}</View>; }
 function ToggleBtn({ owned, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, alignSelf: 'flex-start' }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+'}</Text></TouchableOpacity>; }
-function FishRow({ f, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}><View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text></View><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{f.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{f.category} · {f.sensitivity} · {f.size}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text></TouchableOpacity></View></TouchableOpacity>; }
-function InvRow({ inv, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}><View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text></View><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{inv.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{inv.scientificName}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text></TouchableOpacity></View></TouchableOpacity>; }
+function FishRow({ f, owned, onToggle, onPress }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+          <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>
+            {f.name}{owned ? <Text style={{ color: '#34d399', fontSize: 11 }}> ✓</Text> : null}
+          </Text>
+          <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{f.category} · {f.sensitivity} · {f.size}</Text>
+        </View>
+        <TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+          <Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+}
+function InvRow({ inv, owned, onToggle, onPress }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+          <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>
+            {inv.name}{owned ? <Text style={{ color: '#34d399', fontSize: 11 }}> ✓</Text> : null}
+          </Text>
+          <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{inv.scientificName}</Text>
+        </View>
+        <TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+          <Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+}
 function SecList({ title, items, color }) { return <View style={{ marginTop: 12 }}><Text style={{ color, fontSize: 12, fontWeight: '700', marginBottom: 6 }}>{title}</Text>{items.map((e, i) => <Text key={i} style={{ color: '#cbd5e1', fontSize: 12, paddingLeft: 8, marginBottom: 2 }}>• {e}</Text>)}</View>; }
 
 const S = {
