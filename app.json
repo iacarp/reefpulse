@@ -13,14 +13,18 @@
       "resizeMode": "contain",
       "backgroundColor": "#020617"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.reefpulse.app",
       "buildNumber": "1",
       "icon": "./assets/icon.png",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
         "NSPhotoLibraryUsageDescription": "Allow ReefPulse to access your photos to upload your tank photo.",
         "NSCameraUsageDescription": "Allow ReefPulse to use your camera to take a tank photo.",
         "NSUserNotificationsUsageDescription": "ReefPulse sends reminders for water tests and equipment maintenance."
@@ -45,7 +49,8 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "single"
     },
     "extra": {
       "eas": {
