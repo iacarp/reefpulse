@@ -2,14 +2,7 @@
   "buildCommand": "npx expo export --platform web && node inject-adsense.js",
   "outputDirectory": "dist",
   "framework": null,
-  "routes": [
-    {
-      "src": "/ads.txt",
-      "dest": "/ads.txt"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
