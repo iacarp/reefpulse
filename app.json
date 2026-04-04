@@ -2,30 +2,36 @@
   "expo": {
     "name": "ReefPulse",
     "slug": "reefpulse",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#020617",
     "primaryColor": "#06b6d4",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#020617"
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.reefpulse.app",
       "buildNumber": "1",
+      "icon": "./assets/icon.png",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ],
+        "UIBackgroundModes": ["remote-notification"],
         "NSPhotoLibraryUsageDescription": "Allow ReefPulse to access your photos to upload your tank photo.",
-        "NSCameraUsageDescription": "Allow ReefPulse to use your camera to take a tank photo."
+        "NSCameraUsageDescription": "Allow ReefPulse to use your camera to take a tank photo.",
+        "NSUserNotificationsUsageDescription": "ReefPulse sends reminders for water tests and equipment maintenance."
       }
     },
     "android": {
       "package": "com.reefpulse.app",
       "versionCode": 1,
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#020617"
       },
       "permissions": [
@@ -38,7 +44,8 @@
       ]
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
