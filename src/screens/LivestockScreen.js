@@ -22,6 +22,7 @@ export default function LivestockScreen({ navigation, route }) {
   const [myQty, setMyQty] = useState({});
   const [myCorals, setMyCorals] = useState([]);
   const [sel, setSel] = useState(null);
+  const [search, setSearch] = useState('');
   const [wishlist, setWishlist] = useState([]);
 
   const load = async () => {
