@@ -33,12 +33,6 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   `;
   document.head.appendChild(style);
 
-  // PWA manifest for "app-like" feel
-  const manifest = document.createElement('link');
-  manifest.rel = 'manifest';
-  manifest.href = '/manifest.json';
-  document.head.appendChild(manifest);
-
   // Theme color
   const theme = document.createElement('meta');
   theme.name = 'theme-color';
