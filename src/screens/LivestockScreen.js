@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getMyLivestock, addLivestock, removeLivestock, updateLivestockQty } from '../utils/database';
 import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, getDiseases } from '../data/livestock';
@@ -32,7 +32,7 @@ export default function LivestockScreen({ navigation, route }) {
   useFocusEffect(useCallback(() => { load(); }, []));
 
   React.useEffect(() => {
-    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); });
+    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
     return unsub;
   }, [navigation]);
 
@@ -216,9 +216,32 @@ export default function LivestockScreen({ navigation, route }) {
         {myFish.length === 0 && myInverts.length === 0 && <Card><Text style={{ color: '#64748b', fontSize: 14, textAlign: 'center', padding: 20 }}>{t.emptyTank}</Text></Card>}
       </>)}
 
-      {tab === 'fish' && FISH_DATABASE.map(f => <FishRow key={f.id} f={f} owned={myFish.includes(f.id)} onToggle={() => toggleFish(f.id)} onPress={() => setSel({ type: 'fish', id: f.id })} />)}
+      {tab === 'fish' && (<>
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', borderRadius: 12, paddingHorizontal: 12, marginBottom: 12 }}>
+          <Text style={{ color: '#475569', fontSize: 16, marginRight: 8 }}>🔍</Text>
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search fish..." placeholderTextColor="#334155"
+            style={{ flex: 1, color: '#e2e8f0', fontSize: 14, paddingVertical: 10 }} />
+          {search.length > 0 && <TouchableOpacity onPress={() => setSearch('')}><Text style={{ color: '#475569', fontSize: 16, paddingLeft: 8 }}>✕</Text></TouchableOpacity>}
+        </View>
+        {FISH_DATABASE
+          .filter(f => !search || f.name.toLowerCase().includes(search.toLowerCase()) || f.scientificName.toLowerCase().includes(search.toLowerCase()) || f.category.toLowerCase().includes(search.toLowerCase()))
+          .map(f => <FishRow key={f.id} f={f} owned={myFish.includes(f.id)} onToggle={() => toggleFish(f.id)} onPress={() => setSel({ type: 'fish', id: f.id })} />)}
+        {FISH_DATABASE.filter(f => !search || f.name.toLowerCase().includes(search.toLowerCase())).length === 0 && (
+          <View style={{ alignItems: 'center', padding: 32 }}><Text style={{ color: '#334155', fontSize: 14 }}>No fish found for "{search}"</Text></View>
+        )}
+      </>)}
 
-      {tab === 'inverts' && INVERT_DATABASE.map(inv => <InvRow key={inv.id} inv={inv} owned={myInverts.includes(inv.id)} onToggle={() => toggleInvert(inv.id)} onPress={() => setSel({ type: 'invert', id: inv.id })} />)}
+      {tab === 'inverts' && (<>
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', borderRadius: 12, paddingHorizontal: 12, marginBottom: 12 }}>
+          <Text style={{ color: '#475569', fontSize: 16, marginRight: 8 }}>🔍</Text>
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search invertebrates..." placeholderTextColor="#334155"
+            style={{ flex: 1, color: '#e2e8f0', fontSize: 14, paddingVertical: 10 }} />
+          {search.length > 0 && <TouchableOpacity onPress={() => setSearch('')}><Text style={{ color: '#475569', fontSize: 16, paddingLeft: 8 }}>✕</Text></TouchableOpacity>}
+        </View>
+        {INVERT_DATABASE
+          .filter(inv => !search || inv.name.toLowerCase().includes(search.toLowerCase()) || inv.scientificName.toLowerCase().includes(search.toLowerCase()))
+          .map(inv => <InvRow key={inv.id} inv={inv} owned={myInverts.includes(inv.id)} onToggle={() => toggleInvert(inv.id)} onPress={() => setSel({ type: 'invert', id: inv.id })} />)}
+      </>)}
 
       {/* COMPATIBILITY TAB */}
       {tab === 'compat' && (<>
@@ -321,8 +344,8 @@ function IB({ title, text, color }) { return <View style={{ marginTop: 8, backgr
 function LI({ title, sub, onPress, right }) { return <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 6 }}><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '500' }}>{title}</Text>{sub && <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{sub}</Text>}</View>{right}</TouchableOpacity>; }
 function Row({ children, between }) { return <View style={{ flexDirection: 'row', justifyContent: between ? 'space-between' : 'flex-start', marginBottom: 12 }}>{children}</View>; }
 function ToggleBtn({ owned, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, alignSelf: 'flex-start' }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+'}</Text></TouchableOpacity>; }
-function FishRow({ f, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{f.name} {owned && <Text style={{ color: '#34d399' }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{f.category} · {f.sensitivity} · {f.size}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12 }}>{owned ? '✕' : '+'}</Text></TouchableOpacity></View></TouchableOpacity>; }
-function InvRow({ inv, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{inv.name} {owned && <Text style={{ color: '#34d399' }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{inv.category} · {inv.sensitivity}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12 }}>{owned ? '✕' : '+'}</Text></TouchableOpacity></View></TouchableOpacity>; }
+function FishRow({ f, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}><View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text></View><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{f.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{f.category} · {f.sensitivity} · {f.size}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text></TouchableOpacity></View></TouchableOpacity>; }
+function InvRow({ inv, owned, onToggle, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}><View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text></View><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{inv.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}</Text><Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{inv.scientificName}</Text></View><TouchableOpacity onPress={onToggle} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+ Add'}</Text></TouchableOpacity></View></TouchableOpacity>; }
 function SecList({ title, items, color }) { return <View style={{ marginTop: 12 }}><Text style={{ color, fontSize: 12, fontWeight: '700', marginBottom: 6 }}>{title}</Text>{items.map((e, i) => <Text key={i} style={{ color: '#cbd5e1', fontSize: 12, paddingLeft: 8, marginBottom: 2 }}>• {e}</Text>)}</View>; }
 
 const S = {

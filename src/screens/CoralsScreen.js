@@ -31,6 +31,7 @@ const EMPTY_FORM = {
 export default function CoralsScreen({ navigation }) {
   const { t } = useI18n();
   const [tab, setTab]           = useState('my');
+  const [search, setSearch]     = useState('');
   const [filter, setFilter]     = useState('All');
   const [sel, setSel]           = useState(null);      // { id, isCustom }
   const [myCorals, setMyCorals] = useState([]);        // ref_ids from livestock
@@ -46,7 +47,7 @@ export default function CoralsScreen({ navigation }) {
   useFocusEffect(useCallback(() => { load(); }, []));
 
   React.useEffect(() => {
-    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); });
+    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
     return unsub;
   }, [navigation]);
 
@@ -212,7 +213,10 @@ export default function CoralsScreen({ navigation }) {
 
   // ── MAIN LIST ──
   const types    = ['All', 'SPS', 'LPS', 'Soft', 'Anemone'];
-  const dbFiltered  = filter === 'All' ? CORAL_DATABASE : CORAL_DATABASE.filter(c => c.type === filter);
+  const searchLow  = search.toLowerCase().trim();
+  const dbFiltered  = CORAL_DATABASE
+    .filter(c => filter === 'All' || c.type === filter)
+    .filter(c => !searchLow || c.name.toLowerCase().includes(searchLow) || c.sub.toLowerCase().includes(searchLow));
   const subs        = [...new Set(dbFiltered.map(c => c.sub))];
 
   // My corals = DB corals I own + custom corals I own
@@ -275,7 +279,7 @@ export default function CoralsScreen({ navigation }) {
                   style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#1e293b', marginBottom: 8, borderLeftWidth: 3, borderLeftColor: tc }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{c.name}</Text>
+                      <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>{c.emoji ? c.emoji + ' ' : ''}{c.name}</Text>
                       <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
                         <View style={{ backgroundColor: `${tc}20`, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 }}>
                           <Text style={{ color: tc, fontSize: 10 }}>{c.type}</Text>
@@ -332,6 +336,29 @@ export default function CoralsScreen({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Search bar */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderWidth: 1, borderColor: '#1e293b', borderRadius: 12, paddingHorizontal: 12, marginBottom: 14 }}>
+          <Text style={{ color: '#475569', fontSize: 16, marginRight: 8 }}>🔍</Text>
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search by name or genus..."
+            placeholderTextColor="#334155"
+            style={{ flex: 1, color: '#e2e8f0', fontSize: 14, paddingVertical: 10 }}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Text style={{ color: '#475569', fontSize: 16, paddingLeft: 8 }}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {dbFiltered.length === 0 && (
+          <View style={{ alignItems: 'center', padding: 32 }}>
+            <Text style={{ color: '#334155', fontSize: 14 }}>No corals found for "{search}"</Text>
+          </View>
+        )}
         {subs.map(sub => (
           <View key={sub}>
             <Text style={{ color: '#7c3aed', fontSize: 12, fontWeight: '700', marginBottom: 6, marginTop: 8, letterSpacing: 0.5 }}>{sub}</Text>
@@ -344,7 +371,7 @@ export default function CoralsScreen({ navigation }) {
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
                       <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>
-                        {c.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}
+                        {c.emoji ? c.emoji + ' ' : ''}{c.name} {owned && <Text style={{ color: '#34d399', fontSize: 11 }}>✓</Text>}
                       </Text>
                       <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
                         <View style={{ backgroundColor: `${tc}20`, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 }}>

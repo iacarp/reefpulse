@@ -6,7 +6,7 @@
 export const CORAL_DATABASE = [
   // ==================== SPS — ACROPORIDAE ====================
   {
-    id: "acro_staghorn", name: "Acropora Staghorn", type: "SPS", sub: "Acroporidae",
+    id: "acro_staghorn", emoji: "🌿", name: "Acropora Staghorn", type: "SPS", sub: "Acroporidae",
     difficulty: "Expert", light: "High (300-500 PAR)", flow: "High",
     alk: [7.5, 9.0], ca: [420, 450], mg: [1280, 1380], no3: [1, 10], po4: [0.02, 0.06],
     temp: [25, 27], ph: [8.1, 8.4], sal: [1.025, 1.026],
@@ -17,7 +17,7 @@ export const CORAL_DATABASE = [
     notes: "Queen of SPS. Ultra sensitive to Alk swings. Tank must be 12+ months mature."
   },
   {
-    id: "acro_table", name: "Acropora Table/Plating", type: "SPS", sub: "Acroporidae",
+    id: "acro_table", emoji: "🍄", name: "Acropora Table/Plating", type: "SPS", sub: "Acroporidae",
     difficulty: "Expert", light: "High (300-500 PAR)", flow: "High",
     alk: [7.5, 9.0], ca: [420, 450], mg: [1280, 1380], no3: [1, 10], po4: [0.02, 0.06],
     temp: [25, 27], ph: [8.1, 8.4], sal: [1.025, 1.026],
@@ -28,7 +28,7 @@ export const CORAL_DATABASE = [
     notes: "Plate-like growth. Needs strong light from above."
   },
   {
-    id: "acro_milli", name: "Acropora Millepora", type: "SPS", sub: "Acroporidae",
+    id: "acro_milli", emoji: "🌱", name: "Acropora Millepora", type: "SPS", sub: "Acroporidae",
     difficulty: "Expert", light: "High (350-500 PAR)", flow: "High",
     alk: [7.5, 8.5], ca: [420, 450], mg: [1280, 1380], no3: [1, 8], po4: [0.02, 0.05],
     temp: [25, 26.5], ph: [8.1, 8.4], sal: [1.025, 1.026],
@@ -39,7 +39,7 @@ export const CORAL_DATABASE = [
     notes: "Compact bushy growth. Incredible colors. Very demanding."
   },
   {
-    id: "monti_cap", name: "Montipora Capricornis", type: "SPS", sub: "Acroporidae",
+    id: "monti_cap", emoji: "🍃", name: "Montipora Capricornis", type: "SPS", sub: "Acroporidae",
     difficulty: "Moderate", light: "Medium-High (200-400 PAR)", flow: "Medium-High",
     alk: [7.0, 9.0], ca: [400, 450], mg: [1280, 1380], no3: [2, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -50,7 +50,7 @@ export const CORAL_DATABASE = [
     notes: "Plating Montipora. Great starter SPS. More forgiving than Acropora."
   },
   {
-    id: "monti_digi", name: "Montipora Digitata", type: "SPS", sub: "Acroporidae",
+    id: "monti_digi", emoji: "🌾", name: "Montipora Digitata", type: "SPS", sub: "Acroporidae",
     difficulty: "Moderate", light: "Medium-High (200-400 PAR)", flow: "Medium-High",
     alk: [7.0, 9.0], ca: [400, 450], mg: [1280, 1380], no3: [2, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -63,7 +63,7 @@ export const CORAL_DATABASE = [
 
   // ==================== SPS — POCILLOPORIDAE ====================
   {
-    id: "stylophora", name: "Stylophora", type: "SPS", sub: "Pocilloporidae",
+    id: "stylophora", emoji: "🔴", name: "Stylophora", type: "SPS", sub: "Pocilloporidae",
     difficulty: "Moderate", light: "Medium-High (200-400 PAR)", flow: "Medium-High",
     alk: [7.5, 9.0], ca: [400, 440], mg: [1280, 1380], no3: [2, 10], po4: [0.02, 0.08],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -74,7 +74,7 @@ export const CORAL_DATABASE = [
     notes: "Fast grower. Responds well to amino acid dosing."
   },
   {
-    id: "pocillopora", name: "Pocillopora", type: "SPS", sub: "Pocilloporidae",
+    id: "pocillopora", emoji: "🌺", name: "Pocillopora", type: "SPS", sub: "Pocilloporidae",
     difficulty: "Moderate", light: "Medium-High (200-400 PAR)", flow: "High",
     alk: [7.5, 9.0], ca: [400, 440], mg: [1280, 1380], no3: [2, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -85,7 +85,7 @@ export const CORAL_DATABASE = [
     notes: "Cauliflower coral. Good indicator for tank health."
   },
   {
-    id: "seriatopora", name: "Seriatopora (Birdsnest)", type: "SPS", sub: "Pocilloporidae",
+    id: "seriatopora", emoji: "🐦", name: "Seriatopora (Birdsnest)", type: "SPS", sub: "Pocilloporidae",
     difficulty: "Moderate", light: "Medium (150-350 PAR)", flow: "Medium",
     alk: [7.0, 9.0], ca: [400, 440], mg: [1280, 1380], no3: [2, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -98,7 +98,7 @@ export const CORAL_DATABASE = [
 
   // ==================== SPS — AGARICIIDAE ====================
   {
-    id: "leptoseris", name: "Leptoseris", type: "SPS", sub: "Agariciidae",
+    id: "leptoseris", emoji: "🪨", name: "Leptoseris", type: "SPS", sub: "Agariciidae",
     difficulty: "Moderate", light: "Low-Medium (80-200 PAR)", flow: "Low-Medium",
     alk: [7.0, 9.0], ca: [400, 440], mg: [1280, 1380], no3: [2, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -109,7 +109,7 @@ export const CORAL_DATABASE = [
     notes: "Low-light SPS. Great for shaded areas. Encrusting/plating."
   },
   {
-    id: "pavona", name: "Pavona (Cactus Coral)", type: "SPS", sub: "Agariciidae",
+    id: "pavona", emoji: "🌵", name: "Pavona (Cactus Coral)", type: "SPS", sub: "Agariciidae",
     difficulty: "Easy-Moderate", light: "Medium (100-300 PAR)", flow: "Medium",
     alk: [7.0, 9.5], ca: [380, 450], mg: [1250, 1400], no3: [2, 20], po4: [0.02, 0.12],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -122,7 +122,7 @@ export const CORAL_DATABASE = [
 
   // ==================== LPS — EUPHYLLIIDAE ====================
   {
-    id: "torch", name: "Torch Coral (Euphyllia glabrescens)", type: "LPS", sub: "Euphylliidae",
+    id: "torch", emoji: "🔥", name: "Torch Coral (Euphyllia glabrescens)", type: "LPS", sub: "Euphylliidae",
     difficulty: "Moderate", light: "Medium (100-250 PAR)", flow: "Low-Medium",
     alk: [7.5, 9.5], ca: [400, 450], mg: [1280, 1400], no3: [5, 25], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -133,7 +133,7 @@ export const CORAL_DATABASE = [
     notes: "Long sweepers! Keep 15cm+ from neighbors. Hosts clownfish."
   },
   {
-    id: "hammer", name: "Hammer Coral (Euphyllia ancora)", type: "LPS", sub: "Euphylliidae",
+    id: "hammer", emoji: "🔨", name: "Hammer Coral (Euphyllia ancora)", type: "LPS", sub: "Euphylliidae",
     difficulty: "Moderate", light: "Medium (100-250 PAR)", flow: "Low-Medium",
     alk: [7.5, 9.5], ca: [400, 450], mg: [1280, 1400], no3: [5, 25], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -144,7 +144,7 @@ export const CORAL_DATABASE = [
     notes: "Anchor-shaped tentacles. Less aggressive than Torch."
   },
   {
-    id: "frogspawn", name: "Frogspawn (Euphyllia divisa)", type: "LPS", sub: "Euphylliidae",
+    id: "frogspawn", emoji: "🟢", name: "Frogspawn (Euphyllia divisa)", type: "LPS", sub: "Euphylliidae",
     difficulty: "Moderate", light: "Medium (100-250 PAR)", flow: "Low-Medium",
     alk: [7.5, 9.5], ca: [400, 450], mg: [1280, 1400], no3: [5, 25], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -157,7 +157,7 @@ export const CORAL_DATABASE = [
 
   // ==================== LPS — LOBOPHYLLIIDAE ====================
   {
-    id: "acanthastrea", name: "Acanthastrea / Micromussa", type: "LPS", sub: "Lobophylliidae",
+    id: "acanthastrea", emoji: "🎨", name: "Acanthastrea / Micromussa", type: "LPS", sub: "Lobophylliidae",
     difficulty: "Easy-Moderate", light: "Low-Medium (50-200 PAR)", flow: "Low-Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -168,7 +168,7 @@ export const CORAL_DATABASE = [
     notes: "War paint colors. Great for beginners. Target feed for best growth."
   },
   {
-    id: "lobophyllia", name: "Lobophyllia (Lobo Brain)", type: "LPS", sub: "Lobophylliidae",
+    id: "lobophyllia", emoji: "🧠", name: "Lobophyllia (Lobo Brain)", type: "LPS", sub: "Lobophylliidae",
     difficulty: "Easy", light: "Low-Medium (50-200 PAR)", flow: "Low",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -181,7 +181,7 @@ export const CORAL_DATABASE = [
 
   // ==================== LPS — MERULINIDAE ====================
   {
-    id: "favia", name: "Favia/Favites (Brain Coral)", type: "LPS", sub: "Merulinidae",
+    id: "favia", emoji: "🧠", name: "Favia/Favites (Brain Coral)", type: "LPS", sub: "Merulinidae",
     difficulty: "Easy", light: "Low-Medium (50-200 PAR)", flow: "Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 35], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -192,7 +192,7 @@ export const CORAL_DATABASE = [
     notes: "Classic brain coral. Very hardy. Long sweepers at night."
   },
   {
-    id: "blastomussa", name: "Blastomussa", type: "LPS", sub: "Merulinidae",
+    id: "blastomussa", emoji: "🔵", name: "Blastomussa", type: "LPS", sub: "Merulinidae",
     difficulty: "Easy", light: "Low (50-150 PAR)", flow: "Low",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -203,7 +203,7 @@ export const CORAL_DATABASE = [
     notes: "Very hardy. Shaded areas with gentle flow."
   },
   {
-    id: "caulastraea", name: "Caulastraea (Trumpet/Candy Cane)", type: "LPS", sub: "Merulinidae",
+    id: "caulastraea", emoji: "🍭", name: "Caulastraea (Trumpet/Candy Cane)", type: "LPS", sub: "Merulinidae",
     difficulty: "Easy", light: "Medium (100-200 PAR)", flow: "Low-Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -214,7 +214,7 @@ export const CORAL_DATABASE = [
     notes: "Finger-shaped. Great for nano tanks. Easy to frag."
   },
   {
-    id: "cyphastrea", name: "Cyphastrea", type: "LPS", sub: "Merulinidae",
+    id: "cyphastrea", emoji: "🌊", name: "Cyphastrea", type: "LPS", sub: "Merulinidae",
     difficulty: "Easy", light: "Low-Medium (50-200 PAR)", flow: "Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -227,7 +227,7 @@ export const CORAL_DATABASE = [
 
   // ==================== LPS — PORITIDAE ====================
   {
-    id: "goniopora", name: "Goniopora (Flowerpot)", type: "LPS", sub: "Poritidae",
+    id: "goniopora", emoji: "🌸", name: "Goniopora (Flowerpot)", type: "LPS", sub: "Poritidae",
     difficulty: "Moderate-Hard", light: "Medium (100-250 PAR)", flow: "Low-Medium",
     alk: [7.5, 9.0], ca: [400, 450], mg: [1280, 1400], no3: [3, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -238,7 +238,7 @@ export const CORAL_DATABASE = [
     notes: "Beautiful but historically difficult. Target feed regularly."
   },
   {
-    id: "alveopora", name: "Alveopora", type: "LPS", sub: "Poritidae",
+    id: "alveopora", emoji: "🌼", name: "Alveopora", type: "LPS", sub: "Poritidae",
     difficulty: "Moderate", light: "Medium (100-200 PAR)", flow: "Low-Medium",
     alk: [7.5, 9.0], ca: [400, 450], mg: [1280, 1400], no3: [3, 15], po4: [0.02, 0.10],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -251,7 +251,7 @@ export const CORAL_DATABASE = [
 
   // ==================== LPS — OTHERS ====================
   {
-    id: "duncan", name: "Duncanopsammia (Duncan)", type: "LPS", sub: "Dendrophylliidae",
+    id: "duncan", emoji: "🟡", name: "Duncanopsammia (Duncan)", type: "LPS", sub: "Dendrophylliidae",
     difficulty: "Easy", light: "Low-Medium (50-200 PAR)", flow: "Low-Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -262,7 +262,7 @@ export const CORAL_DATABASE = [
     notes: "Ultra fast grower. Feed for amazing results."
   },
   {
-    id: "galaxea", name: "Galaxea (Crystal Coral)", type: "LPS", sub: "Oculinidae",
+    id: "galaxea", emoji: "💎", name: "Galaxea (Crystal Coral)", type: "LPS", sub: "Oculinidae",
     difficulty: "Easy-Moderate", light: "Medium (100-250 PAR)", flow: "Low-Medium",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -273,7 +273,7 @@ export const CORAL_DATABASE = [
     notes: "⚠️ VERY long sweepers! Keep isolated. Beautiful starry polyps."
   },
   {
-    id: "fungia", name: "Fungia (Plate/Mushroom Coral)", type: "LPS", sub: "Fungiidae",
+    id: "fungia", emoji: "🍽️", name: "Fungia (Plate/Mushroom Coral)", type: "LPS", sub: "Fungiidae",
     difficulty: "Easy", light: "Low-Medium (50-200 PAR)", flow: "Low",
     alk: [7.0, 10.0], ca: [380, 450], mg: [1250, 1400], no3: [5, 30], po4: [0.03, 0.15],
     temp: [25, 27], ph: [8.0, 8.4], sal: [1.024, 1.026],
@@ -286,7 +286,7 @@ export const CORAL_DATABASE = [
 
   // ==================== SOFT — ZOANTHARIA ====================
   {
-    id: "zoa", name: "Zoanthids (Zoas)", type: "Soft", sub: "Zoantharia",
+    id: "zoa", emoji: "🌈", name: "Zoanthids (Zoas)", type: "Soft", sub: "Zoantharia",
     difficulty: "Easy", light: "Low-High (50-400 PAR)", flow: "Low-Medium",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 40], po4: [0.03, 0.20],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],
@@ -297,7 +297,7 @@ export const CORAL_DATABASE = [
     notes: "Huge color variety. Collector's favorite. Easy to frag."
   },
   {
-    id: "palythoa", name: "Palythoa (Palys)", type: "Soft", sub: "Zoantharia",
+    id: "palythoa", emoji: "🟣", name: "Palythoa (Palys)", type: "Soft", sub: "Zoantharia",
     difficulty: "Easy", light: "Low-High (50-400 PAR)", flow: "Low-Medium",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 40], po4: [0.03, 0.20],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],
@@ -310,7 +310,7 @@ export const CORAL_DATABASE = [
 
   // ==================== SOFT — ALCYONACEA (LEATHERS) ====================
   {
-    id: "sarcophyton", name: "Sarcophyton (Toadstool Leather)", type: "Soft", sub: "Alcyonacea",
+    id: "sarcophyton", emoji: "🍄", name: "Sarcophyton (Toadstool Leather)", type: "Soft", sub: "Alcyonacea",
     difficulty: "Easy", light: "Medium (100-250 PAR)", flow: "Medium",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 40], po4: [0.03, 0.20],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],
@@ -321,7 +321,7 @@ export const CORAL_DATABASE = [
     notes: "Releases terpenes. Use carbon if mixed with SPS. Shedding is normal."
   },
   {
-    id: "sinularia", name: "Sinularia (Finger Leather)", type: "Soft", sub: "Alcyonacea",
+    id: "sinularia", emoji: "🫧", name: "Sinularia (Finger Leather)", type: "Soft", sub: "Alcyonacea",
     difficulty: "Easy", light: "Medium (100-250 PAR)", flow: "Medium",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 40], po4: [0.03, 0.20],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],
@@ -332,7 +332,7 @@ export const CORAL_DATABASE = [
     notes: "Chemical warfare vs SPS — run carbon."
   },
   {
-    id: "lobophytum", name: "Lobophytum (Devil's Hand)", type: "Soft", sub: "Alcyonacea",
+    id: "lobophytum", emoji: "✋", name: "Lobophytum (Devil's Hand)", type: "Soft", sub: "Alcyonacea",
     difficulty: "Easy", light: "Medium (100-250 PAR)", flow: "Medium",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 40], po4: [0.03, 0.20],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],
@@ -345,7 +345,7 @@ export const CORAL_DATABASE = [
 
   // ==================== SOFT — CORALLIMORPHARIA ====================
   {
-    id: "discosoma", name: "Discosoma (Mushroom)", type: "Soft", sub: "Corallimorpharia",
+    id: "discosoma", emoji: "💜", name: "Discosoma (Mushroom)", type: "Soft", sub: "Corallimorpharia",
     difficulty: "Easy", light: "Low (30-150 PAR)", flow: "Low",
     alk: [7.0, 11.0], ca: [350, 450], mg: [1200, 1400], no3: [5, 50], po4: [0.03, 0.25],
     temp: [24, 28], ph: [7.8, 8.5], sal: [1.023, 1.027],

@@ -21,6 +21,7 @@ export default function DashboardScreen({ navigation }) {
   const [showLang, setShowLang] = useState(false);
   const [todayTodos, setTodayTodos] = useState([]);
   const [todayDueEq, setTodayDueEq] = useState([]);
+  const [customCorals, setCustomCorals] = useState([]);
   const [tankPhoto, setTankPhoto] = useState(null);
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -29,6 +30,7 @@ export default function DashboardScreen({ navigation }) {
     try { const p = await AsyncStorage.getItem('tank_photo'); if (p) setTankPhoto(p); } catch {}
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
+    try { const cc = await AsyncStorage.getItem('custom_corals'); setCustomCorals(cc ? JSON.parse(cc) : []); } catch {}
     // Load today's todos sorted by time
     try {
       const td = await AsyncStorage.getItem('todos');
@@ -55,7 +57,8 @@ export default function DashboardScreen({ navigation }) {
     const fishCount   = livestock.filter(l => l.type === 'fish').reduce((s,l) => s + (l.qty||1), 0);
     const invertCount = livestock.filter(l => l.type === 'invert').reduce((s,l) => s + (l.qty||1), 0);
     const coralCount  = livestock.filter(l => l.type === 'coral').reduce((s,l) => s + (l.qty||1), 0);
-    setEntries(ent); setLs({ corals: c, fish: f, inverts: i, fishCount, invertCount, coralCount });
+    const qtyMap = {}; livestock.forEach(l => { qtyMap[l.ref_id + '_' + l.type] = l.qty || 1; });
+    setEntries(ent); setLs({ corals: c, fish: f, inverts: i, fishCount, invertCount, coralCount, qtyMap });
     setDiags(runDiagnostics(ent, CORE_PARAMS, c, f, i, CORAL_DATABASE, FISH_DATABASE, INVERT_DATABASE, lang));
   };
 
@@ -228,12 +231,11 @@ export default function DashboardScreen({ navigation }) {
         </TouchableOpacity>
       )}
 
-      {/* Tank Summary */}
+      {/* Tank Summary — counts row */}
       <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1e293b', marginBottom: 12 }}>
         <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>🐠 {t.myAquarium}</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-          <TouchableOpacity onPress={() => navigation.navigate('Aquarium', { screen: 'Aquarium', params: { tab: 'compat' } })}
-            style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Aquarium')}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 16 }}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Corals')}>
             <Text style={{ fontSize: 22 }}>🪸</Text>
             <Text style={{ color: '#06b6d4', fontSize: 22, fontWeight: '700' }}>{ls.coralCount ?? ls.corals.length}</Text>
             <Text style={{ color: '#64748b', fontSize: 10 }}>{t.coralsLabel}</Text>
@@ -254,6 +256,69 @@ export default function DashboardScreen({ navigation }) {
             <Text style={{ color: '#64748b', fontSize: 10 }}>{t.testsLabel}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Fish list */}
+        {ls.fish.length > 0 && (<>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🐟 FISH</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            {ls.fish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
+              const qty = ls.qtyMap?.[id + '_fish'] || 1;
+              return (
+                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish' })}
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
+                  <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>)}
+
+        {/* Inverts list */}
+        {ls.inverts.length > 0 && (<>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🦐 INVERTS</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            {ls.inverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
+              const qty = ls.qtyMap?.[id + '_invert'] || 1;
+              return (
+                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts' })}
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
+                  <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>)}
+
+        {/* Corals list */}
+        {ls.corals.length > 0 && (<>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🪸 CORALS</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {ls.corals.map(id => {
+              const isCustom = String(id).startsWith('custom_');
+              const c = isCustom
+                ? customCorals.find(x => `custom_${x.id}` === id)
+                : CORAL_DATABASE.find(x => x.id === id);
+              if (!c) return null;
+              const tc = { SPS: '#ef4444', LPS: '#f59e0b', Soft: '#10b981', Anemone: '#8b5cf6' };
+              const type = isCustom ? c.category : c.type;
+              return (
+                <TouchableOpacity key={id} onPress={() => navigation.navigate('Corals')}
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60, borderBottomWidth: 2, borderBottomColor: tc[type] || '#334155' }}>
+                  <Text style={{ fontSize: 22 }}>{c.emoji || '🪸'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{c.name.split(' ')[0]}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>)}
+
+        {ls.fish.length === 0 && ls.inverts.length === 0 && ls.corals.length === 0 && (
+          <Text style={{ color: '#334155', fontSize: 13, textAlign: 'center', paddingVertical: 8 }}>Tank is empty — add fish, inverts and corals</Text>
+        )}
       </View>
 
 

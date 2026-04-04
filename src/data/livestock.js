@@ -5,7 +5,7 @@
 
 export const FISH_DATABASE = [
   {
-    id: "ocellaris", name: "Ocellaris Clownfish", scientificName: "Amphiprion ocellaris",
+    id: "ocellaris", emoji: "🤿", name: "Ocellaris Clownfish", scientificName: "Amphiprion ocellaris",
     category: "Clownfish", sensitivity: "Low", size: "8cm", minTank: 60,
     temp: [24, 28], sal: [1.023, 1.026], no3_max: 40, ph: [7.8, 8.4],
     diet: "Omnivore — pellets, flakes, frozen mysis/brine, nori",
@@ -17,7 +17,7 @@ export const FISH_DATABASE = [
     image: "clownfish_ocellaris"
   },
   {
-    id: "percula", name: "True Percula Clownfish", scientificName: "Amphiprion percula",
+    id: "percula", emoji: "🐠", name: "True Percula Clownfish", scientificName: "Amphiprion percula",
     category: "Clownfish", sensitivity: "Low", size: "8cm", minTank: 60,
     temp: [24, 28], sal: [1.023, 1.026], no3_max: 40, ph: [7.8, 8.4],
     diet: "Omnivore — same as Ocellaris",
@@ -29,7 +29,7 @@ export const FISH_DATABASE = [
     image: "clownfish_percula"
   },
   {
-    id: "royal_gramma", name: "Royal Gramma", scientificName: "Gramma loreto",
+    id: "royal_gramma", emoji: "💜", name: "Royal Gramma", scientificName: "Gramma loreto",
     category: "Basslet", sensitivity: "Low", size: "8cm", minTank: 80,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, small pellets",
@@ -41,7 +41,7 @@ export const FISH_DATABASE = [
     image: "royal_gramma"
   },
   {
-    id: "yellow_tang", name: "Yellow Tang", scientificName: "Zebrasoma flavescens",
+    id: "yellow_tang", emoji: "🐡", name: "Yellow Tang", scientificName: "Zebrasoma flavescens",
     category: "Tang/Surgeonfish", sensitivity: "Medium", size: "20cm", minTank: 300,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 25, ph: [8.0, 8.4],
     diet: "Herbivore — nori/seaweed sheets daily, supplemented with frozen and pellets",
@@ -53,7 +53,7 @@ export const FISH_DATABASE = [
     image: "yellow_tang"
   },
   {
-    id: "mandarin", name: "Mandarin Dragonet", scientificName: "Synchiropus splendidus",
+    id: "mandarin", emoji: "🎨", name: "Mandarin Dragonet", scientificName: "Synchiropus splendidus",
     category: "Dragonet", sensitivity: "High", size: "8cm", minTank: 150,
     temp: [24, 27], sal: [1.024, 1.026], no3_max: 15, ph: [8.0, 8.4],
     diet: "Micro-carnivore — primarily copepods/amphipods. MUST have established copepod population. Supplement with live brine, Reef Nutrition TDO, or frozen cyclops. Some can be trained to eat frozen but many cannot.",
@@ -65,7 +65,7 @@ export const FISH_DATABASE = [
     image: "mandarin"
   },
   {
-    id: "firefish", name: "Firefish Goby", scientificName: "Nemateleotris magnifica",
+    id: "firefish", emoji: "🔴", name: "Firefish Goby", scientificName: "Nemateleotris magnifica",
     category: "Goby", sensitivity: "Low", size: "7cm", minTank: 40,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, small pellets",
@@ -77,7 +77,7 @@ export const FISH_DATABASE = [
     image: "firefish"
   },
   {
-    id: "blenny_tail", name: "Tailspot Blenny", scientificName: "Ecsenius stigmatura",
+    id: "blenny_tail", emoji: "🟤", name: "Tailspot Blenny", scientificName: "Ecsenius stigmatura",
     category: "Blenny", sensitivity: "Low", size: "6cm", minTank: 40,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Herbivore/Omnivore — algae, spirulina, nori, pellets",
@@ -89,7 +89,7 @@ export const FISH_DATABASE = [
     image: "tailspot_blenny"
   },
   {
-    id: "blenny_lawn", name: "Lawnmower Blenny", scientificName: "Salarias fasciatus",
+    id: "blenny_lawn", emoji: "🟢", name: "Lawnmower Blenny", scientificName: "Salarias fasciatus",
     category: "Blenny", sensitivity: "Low", size: "12cm", minTank: 100,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Herbivore — film algae primary food. Supplement with nori, spirulina pellets. ⚠️ May starve in clean tanks without algae.",
@@ -101,7 +101,7 @@ export const FISH_DATABASE = [
     image: "lawnmower_blenny"
   },
   {
-    id: "cardinal", name: "Banggai Cardinalfish", scientificName: "Pterapogon kauderni",
+    id: "cardinal", emoji: "⭐", name: "Banggai Cardinalfish", scientificName: "Pterapogon kauderni",
     category: "Cardinalfish", sensitivity: "Low", size: "7cm", minTank: 60,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, small pellets. Feed at dusk when most active.",
@@ -113,7 +113,7 @@ export const FISH_DATABASE = [
     image: "banggai_cardinal"
   },
   {
-    id: "anthias", name: "Lyretail Anthias", scientificName: "Pseudanthias squamipinnis",
+    id: "anthias", emoji: "🟠", name: "Lyretail Anthias", scientificName: "Pseudanthias squamipinnis",
     category: "Anthias", sensitivity: "Medium-High", size: "12cm", minTank: 300,
     temp: [24, 27], sal: [1.024, 1.026], no3_max: 20, ph: [8.0, 8.4],
     diet: "Planktivore — MUST feed 3x daily minimum. Frozen mysis, cyclops, reef roids. ⚠️ Will starve with once-daily feeding.",
@@ -125,7 +125,7 @@ export const FISH_DATABASE = [
     image: "lyretail_anthias"
   },
   {
-    id: "wrasse_six", name: "Six Line Wrasse", scientificName: "Pseudocheilinus hexataenia",
+    id: "wrasse_six", emoji: "🌈", name: "Six Line Wrasse", scientificName: "Pseudocheilinus hexataenia",
     category: "Wrasse", sensitivity: "Low", size: "8cm", minTank: 100,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, pellets. Hunts pests naturally.",
@@ -137,7 +137,7 @@ export const FISH_DATABASE = [
     image: "sixline_wrasse"
   },
   {
-    id: "wrasse_fairy", name: "Fairy Wrasse", scientificName: "Cirrhilabrus spp.",
+    id: "wrasse_fairy", emoji: "🧚", name: "Fairy Wrasse", scientificName: "Cirrhilabrus spp.",
     category: "Wrasse", sensitivity: "Low-Medium", size: "10cm", minTank: 150,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 25, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, pellets",
@@ -149,7 +149,7 @@ export const FISH_DATABASE = [
     image: "fairy_wrasse"
   },
   {
-    id: "goby_watchman", name: "Watchman Goby", scientificName: "Cryptocentrus spp.",
+    id: "goby_watchman", emoji: "👁️", name: "Watchman Goby", scientificName: "Cryptocentrus spp.",
     category: "Goby", sensitivity: "Low", size: "10cm", minTank: 80,
     temp: [24, 27], sal: [1.023, 1.026], no3_max: 30, ph: [8.0, 8.4],
     diet: "Carnivore — frozen mysis, brine, pellets",
@@ -167,7 +167,7 @@ export const FISH_DATABASE = [
 // ============================================================
 export const INVERT_DATABASE = [
   {
-    id: "peppermint", name: "Peppermint Shrimp", scientificName: "Lysmata wurdemanni",
+    id: "peppermint", emoji: "🦐", name: "Peppermint Shrimp", scientificName: "Lysmata wurdemanni",
     category: "Shrimp", sensitivity: "Medium", no3_max: 20,
     acclimation: "Drip acclimate 45-60 min. Inverts are MORE sensitive to salinity/pH changes than fish. Never rush.",
     care: "⚠️ COPPER KILLS ALL INVERTEBRATES. Never use copper medication in display tank. Eats Aiptasia anemones — main reason people buy them. Nocturnal. May nip at soft corals if very hungry.",
@@ -176,7 +176,7 @@ export const INVERT_DATABASE = [
     image: "peppermint_shrimp"
   },
   {
-    id: "cleaner", name: "Skunk Cleaner Shrimp", scientificName: "Lysmata amboinensis",
+    id: "cleaner", emoji: "✂️", name: "Skunk Cleaner Shrimp", scientificName: "Lysmata amboinensis",
     category: "Shrimp", sensitivity: "Medium", no3_max: 20,
     acclimation: "Drip 45-60 min. Very sensitive to salinity swings.",
     care: "Sets up 'cleaning station' — fish come to it for parasite removal. Fascinating behavior. Will clean your hands too! Keep in pairs for better success. Molts regularly — empty shell is normal, not a dead shrimp.",
@@ -185,7 +185,7 @@ export const INVERT_DATABASE = [
     image: "cleaner_shrimp"
   },
   {
-    id: "fire_shrimp", name: "Fire/Blood Shrimp", scientificName: "Lysmata debelius",
+    id: "fire_shrimp", emoji: "🔴", name: "Fire/Blood Shrimp", scientificName: "Lysmata debelius",
     category: "Shrimp", sensitivity: "Medium", no3_max: 20,
     acclimation: "Drip 45-60 min.",
     care: "Stunning deep red color with white spots. Nocturnal — hides during the day, comes out at night. Also provides cleaning services. Shy.",
@@ -194,7 +194,7 @@ export const INVERT_DATABASE = [
     image: "fire_shrimp"
   },
   {
-    id: "hermit", name: "Hermit Crabs (various)", scientificName: "Various spp.",
+    id: "hermit", emoji: "🐚", name: "Hermit Crabs (various)", scientificName: "Various spp.",
     category: "CUC", sensitivity: "Low", no3_max: 30,
     acclimation: "Drip 30-45 min.",
     care: "Cleanup Crew (CUC) staple. Eats algae, detritus, leftover food. PROVIDE EXTRA SHELLS — they need to upgrade as they grow. Without spare shells, they may kill snails for theirs.",
@@ -203,7 +203,7 @@ export const INVERT_DATABASE = [
     image: "hermit_crab"
   },
   {
-    id: "turbo", name: "Turbo/Trochus Snails", scientificName: "Turbo/Trochus spp.",
+    id: "turbo", emoji: "🐌", name: "Turbo/Trochus Snails", scientificName: "Turbo/Trochus spp.",
     category: "CUC", sensitivity: "Low", no3_max: 30,
     acclimation: "Drip 30-45 min. Place right-side up on glass or rock.",
     care: "Best glass and rock algae cleaners. Trochus can right themselves if they fall; Turbos often cannot — check for flipped snails. Trochus generally better choice. Sensitive to high temps >27°C.",
@@ -212,7 +212,7 @@ export const INVERT_DATABASE = [
     image: "turbo_snail"
   },
   {
-    id: "nassarius", name: "Nassarius Snails", scientificName: "Nassarius spp.",
+    id: "nassarius", emoji: "⚪", name: "Nassarius Snails", scientificName: "Nassarius spp.",
     category: "CUC", sensitivity: "Low", no3_max: 30,
     acclimation: "Drip 30 min. Place on sand bed.",
     care: "Sand bed cleaners. Bury in sand and emerge dramatically when they smell food. Excellent detritus eaters. Will not eat algae — they eat meaty leftovers and detritus only.",
@@ -221,7 +221,7 @@ export const INVERT_DATABASE = [
     image: "nassarius_snail"
   },
   {
-    id: "urchin", name: "Tuxedo Urchin", scientificName: "Mespilia globulus",
+    id: "urchin", emoji: "⭐", name: "Tuxedo Urchin", scientificName: "Mespilia globulus",
     category: "CUC", sensitivity: "Medium", no3_max: 20,
     acclimation: "Drip 45 min. Very sensitive to salinity changes.",
     care: "Incredible algae eater — can clean a tank overnight. Carries shells, frags, and debris on its spines for camouflage. ⚠️ WILL bulldoze unsecured frags and loose rocks. Secure everything before adding.",
@@ -230,7 +230,7 @@ export const INVERT_DATABASE = [
     image: "tuxedo_urchin"
   },
   {
-    id: "emerald", name: "Emerald Crab", scientificName: "Mithraculus sculptus",
+    id: "emerald", emoji: "🦀", name: "Emerald Crab", scientificName: "Mithraculus sculptus",
     category: "CUC", sensitivity: "Low", no3_max: 30,
     acclimation: "Drip 30-45 min.",
     care: "Primary reason to buy: eats bubble algae (Valonia). Mostly reef safe but may nip at soft corals or zoanthids if hungry. Feed supplementally to prevent coral nipping.",
