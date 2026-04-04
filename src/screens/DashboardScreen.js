@@ -31,7 +31,7 @@ export default function DashboardScreen({ navigation }) {
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
     try { const cc = await AsyncStorage.getItem('custom_corals'); setCustomCorals(cc ? JSON.parse(cc) : []); } catch {}
-    await loadAnimalPhotos();
+    await loadAnimalPhotos(f, i, c);
     // Load today's todos sorted by time
     try {
       const td = await AsyncStorage.getItem('todos');
@@ -112,13 +112,18 @@ export default function DashboardScreen({ navigation }) {
   // Pick photo for a specific animal
   const [animalPhotos, setAnimalPhotos] = useState({});
 
-  const loadAnimalPhotos = async () => {
+  const loadAnimalPhotos = async (fishIds, invertIds, coralIds) => {
     try {
-      const keys = await AsyncStorage.getAllKeys();
-      const animalKeys = keys.filter(k => k.startsWith('animal_photo_'));
-      const pairs = await AsyncStorage.multiGet(animalKeys);
       const map = {};
-      pairs.forEach(([k, v]) => { map[k] = v; });
+      const allKeys = [
+        ...(fishIds  || []).map(id => `animal_photo_fish_${id}`),
+        ...(invertIds|| []).map(id => `animal_photo_invert_${id}`),
+        ...(coralIds || []).map(id => `animal_photo_coral_${id}`),
+      ];
+      for (const key of allKeys) {
+        const val = await AsyncStorage.getItem(key);
+        if (val) map[key] = val;
+      }
       setAnimalPhotos(map);
     } catch {}
   };
