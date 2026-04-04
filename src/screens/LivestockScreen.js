@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import AnimalPhoto from '../components/AnimalPhoto';
 import { getMyLivestock, addLivestock, removeLivestock, updateLivestockQty } from '../utils/database';
 import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, getDiseases } from '../data/livestock';
 import { CORAL_DATABASE } from '../data/corals';
@@ -36,10 +37,12 @@ export default function LivestockScreen({ navigation, route }) {
   };
   useFocusEffect(useCallback(() => { load(); }, []));
 
-  React.useEffect(() => {
-    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
-    return unsub;
-  }, [navigation]);
+  // Reset when tab is focused fresh (handles both tabPress and navigate)
+  useFocusEffect(useCallback(() => {
+    // Only reset sel and search, keep tab if coming from dashboard navigation
+    setSearch('');
+    if (!route?.params?.initialTab) setSel(null);
+  }, [route?.params?.initialTab, route?.params?.ts]));
 
   const toggleFish = async (id) => { if (myFish.includes(id)) await removeLivestock(id, 'fish'); else await addLivestock(id, 'fish'); await load(); };
   const toggleInvert = async (id) => { if (myInverts.includes(id)) await removeLivestock(id, 'invert'); else await addLivestock(id, 'invert'); await load(); };
@@ -174,7 +177,7 @@ export default function LivestockScreen({ navigation, route }) {
           {myFish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
             const qty = myQty[id + '_fish'] || 1;
             return (
-              <LI key={id} title={f.name} sub={f.notes} onPress={() => setSel({ type: 'fish', id })}
+              <LI key={id} title={f.name} sub={f.notes} photo={<AnimalPhoto animalId={f.id} type='fish' emoji={f.emoji} size={40} editable={false} />} onPress={() => setSel({ type: 'fish', id })}
                 right={
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'fish', qty-1); await load(); }}
@@ -194,7 +197,7 @@ export default function LivestockScreen({ navigation, route }) {
           {myInverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
             const qty = myQty[id + '_invert'] || 1;
             return (
-              <LI key={id} title={inv.name} sub={inv.notes} onPress={() => setSel({ type: 'invert', id })}
+              <LI key={id} title={inv.name} sub={inv.notes} photo={<AnimalPhoto animalId={inv.id} type='invert' emoji={inv.emoji} size={40} editable={false} />} onPress={() => setSel({ type: 'invert', id })}
                 right={
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <TouchableOpacity onPress={async () => { await updateLivestockQty(id,'invert', qty-1); await load(); }}
@@ -346,15 +349,26 @@ function DetailScroll({ children, onBack, t }) {
 function Card({ children, style = {} }) { return <View style={{ backgroundColor: '#0f172a', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1e293b', ...style }}>{children}</View>; }
 function Badge({ text, color }) { return <View style={{ backgroundColor: `${color}20`, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, alignSelf: 'flex-start', marginTop: 4 }}><Text style={{ color, fontSize: 10, fontWeight: '600' }}>{text}</Text></View>; }
 function IB({ title, text, color }) { return <View style={{ marginTop: 8, backgroundColor: '#1e293b', borderRadius: 10, padding: 12, borderLeftWidth: 3, borderLeftColor: color }}><Text style={{ color, fontSize: 12, fontWeight: '700', marginBottom: 4 }}>{title}</Text><Text style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 18 }}>{text}</Text></View>; }
-function LI({ title, sub, onPress, right }) { return <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 6 }}><View style={{ flex: 1 }}><Text style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '500' }}>{title}</Text>{sub && <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{sub}</Text>}</View>{right}</TouchableOpacity>; }
+function LI({ title, sub, onPress, right, photo }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#1e293b', marginBottom: 6 }}>
+      {photo && <View style={{ marginRight: 10 }}>{photo}</View>}
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#e2e8f0', fontSize: 13, fontWeight: '500' }}>{title}</Text>
+        {sub ? <Text style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>{sub}</Text> : null}
+      </View>
+      {right}
+    </TouchableOpacity>
+  );
+}
 function Row({ children, between }) { return <View style={{ flexDirection: 'row', justifyContent: between ? 'space-between' : 'flex-start', marginBottom: 12 }}>{children}</View>; }
 function ToggleBtn({ owned, onPress }) { return <TouchableOpacity onPress={onPress} style={{ backgroundColor: owned ? '#dc262620' : '#10b98120', borderWidth: 1, borderColor: owned ? '#dc262640' : '#10b98140', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, alignSelf: 'flex-start' }}><Text style={{ color: owned ? '#f87171' : '#34d399', fontSize: 12, fontWeight: '600' }}>{owned ? '✕' : '+'}</Text></TouchableOpacity>; }
 function FishRow({ f, owned, onToggle, onPress }) {
   return (
     <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-          <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
+        <View style={{ marginRight: 12 }}>
+          <AnimalPhoto animalId={f.id} type="fish" emoji={f.emoji} size={44} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>
@@ -373,8 +387,8 @@ function InvRow({ inv, owned, onToggle, onPress }) {
   return (
     <TouchableOpacity onPress={onPress} style={{ backgroundColor: '#0f172a', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: owned ? '#10b98130' : '#1e293b', marginBottom: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#1e293b', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-          <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
+        <View style={{ marginRight: 12 }}>
+          <AnimalPhoto animalId={inv.id} type="invert" emoji={inv.emoji} size={44} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: '#e2e8f0', fontSize: 14, fontWeight: '600' }}>
