@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-nativ
 import { useFocusEffect } from '@react-navigation/native';
 import { getMyLivestock, addLivestock, removeLivestock, updateLivestockQty } from '../utils/database';
 import { FISH_DATABASE, INVERT_DATABASE, QT_PROTOCOLS, getDiseases } from '../data/livestock';
+import { getLocalizedFish, getLocalizedInvert } from '../data/livestock_i18n';
 import { CORAL_DATABASE } from '../data/corals';
 import { checkFishConflicts, checkCoralConflicts, getRecommendations } from '../data/compatibility';
 import { useI18n } from '../utils/i18n';
@@ -61,7 +62,8 @@ export default function LivestockScreen({ navigation, route }) {
   // ---- DETAIL VIEWS ----
   if (sel) {
     if (sel.type === 'fish') {
-      const f = FISH_DATABASE.find(x => x.id === sel.id); if (!f) { setSel(null); return null; }
+      const fRaw = FISH_DATABASE.find(x => x.id === sel.id); if (!fRaw) { setSel(null); return null; }
+      const f = getLocalizedFish(fRaw, lang);
       const owned = myFish.includes(f.id);
       return <DetailScroll onBack={() => setSel(null)} t={t}>
         <Card>
@@ -89,7 +91,8 @@ export default function LivestockScreen({ navigation, route }) {
       </DetailScroll>;
     }
     if (sel.type === 'invert') {
-      const inv = INVERT_DATABASE.find(x => x.id === sel.id); if (!inv) { setSel(null); return null; }
+      const invRaw = INVERT_DATABASE.find(x => x.id === sel.id); if (!invRaw) { setSel(null); return null; }
+      const inv = getLocalizedInvert(invRaw, lang);
       const owned = myInverts.includes(inv.id);
       return <DetailScroll onBack={() => setSel(null)} t={t}>
         <Card>

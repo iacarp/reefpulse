@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'reac
 import { useFocusEffect } from '@react-navigation/native';
 import { getMyLivestock, addLivestock, removeLivestock } from '../utils/database';
 import { CORAL_DATABASE } from '../data/corals';
+import { getLocalizedCoral } from '../data/livestock_i18n';
 import { CORE_PARAMS } from '../data/parameters';
 import { useI18n } from '../utils/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,7 +30,7 @@ const EMPTY_FORM = {
 };
 
 export default function CoralsScreen({ navigation }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [tab, setTab]           = useState('my');
   const [search, setSearch]     = useState('');
   const [filter, setFilter]     = useState('All');
@@ -111,9 +112,10 @@ export default function CoralsScreen({ navigation }) {
   // ── DETAIL VIEW ──
   if (sel) {
     const isCustom = sel.isCustom;
-    const c = isCustom
+    const cRaw = isCustom
       ? customCorals.find(x => x.id === sel.id)
       : CORAL_DATABASE.find(x => x.id === sel.id);
+    const c = (cRaw && !isCustom) ? getLocalizedCoral(cRaw, lang) : cRaw;
     if (!c) { setSel(null); return null; }
 
     const refId  = isCustom ? `custom_${c.id}` : c.id;
