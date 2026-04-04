@@ -6,7 +6,6 @@ import { CORE_PARAMS, runDiagnostics } from '../data/parameters';
 import { CORAL_DATABASE } from '../data/corals';
 import { FISH_DATABASE, INVERT_DATABASE } from '../data/livestock';
 import { useI18n } from '../utils/i18n';
-import AnimalPhoto from '../components/AnimalPhoto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const W = Dimensions.get('window').width;
@@ -266,12 +265,10 @@ export default function DashboardScreen({ navigation }) {
               const qty = ls.qtyMap?.[id + '_fish'] || 1;
               return (
                 <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish', ts: Date.now() })}
-                  style={{ alignItems: 'center', minWidth: 56 }}>
-                  <View style={{ position: 'relative' }}>
-                    <AnimalPhoto animalId={f.id} type="fish" emoji={f.emoji} size={48} editable={false} />
-                    {qty > 1 && <View style={{ position: 'absolute', top: -3, right: -3, backgroundColor: '#06b6d4', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 }}><Text style={{ color: 'white', fontSize: 9, fontWeight: '700' }}>{qty}</Text></View>}
-                  </View>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
+                  <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
                 </TouchableOpacity>
               );
             })}
@@ -286,12 +283,10 @@ export default function DashboardScreen({ navigation }) {
               const qty = ls.qtyMap?.[id + '_invert'] || 1;
               return (
                 <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts', ts: Date.now() })}
-                  style={{ alignItems: 'center', minWidth: 56 }}>
-                  <View style={{ position: 'relative' }}>
-                    <AnimalPhoto animalId={inv.id} type="invert" emoji={inv.emoji} size={48} editable={false} />
-                    {qty > 1 && <View style={{ position: 'absolute', top: -3, right: -3, backgroundColor: '#06b6d4', borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 }}><Text style={{ color: 'white', fontSize: 9, fontWeight: '700' }}>{qty}</Text></View>}
-                  </View>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
+                  <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
                 </TouchableOpacity>
               );
             })}
@@ -312,11 +307,9 @@ export default function DashboardScreen({ navigation }) {
               const type = isCustom ? c.category : c.type;
               return (
                 <TouchableOpacity key={id} onPress={() => navigation.navigate('Corals')}
-                  style={{ alignItems: 'center', minWidth: 56 }}>
-                  <View style={{ borderRadius: 12, overflow: 'hidden', borderBottomWidth: 2, borderBottomColor: tc[type] || '#334155' }}>
-                    <AnimalPhoto animalId={String(id)} type="coral" emoji={c.emoji} size={48} editable={false} />
-                  </View>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{c.name.split(' ')[0]}</Text>
+                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60, borderBottomWidth: 2, borderBottomColor: tc[type] || '#334155' }}>
+                  <Text style={{ fontSize: 22 }}>{c.emoji || '🪸'}</Text>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{c.name.split(' ')[0]}</Text>
                 </TouchableOpacity>
               );
             })}
