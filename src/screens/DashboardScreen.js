@@ -127,9 +127,11 @@ export default function DashboardScreen({ navigation }) {
         const reader = new FileReader();
         reader.onload = async (ev) => {
           const uri = ev.target.result;
-          const updated = { ...animalPhotos, [key]: uri };
-          setAnimalPhotos(updated);
-          await AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+          setAnimalPhotos(prev => {
+            const updated = { ...prev, [key]: uri };
+            AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+            return updated;
+          });
         };
         reader.readAsDataURL(file);
       };
@@ -142,9 +144,11 @@ export default function DashboardScreen({ navigation }) {
         const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.6 });
         if (!result.canceled && result.assets[0]) {
           const uri = result.assets[0].uri;
-          const updated = { ...animalPhotos, [key]: uri };
-          setAnimalPhotos(updated);
-          await AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+          setAnimalPhotos(prev => {
+            const updated = { ...prev, [key]: uri };
+            AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+            return updated;
+          });
         }
       } catch (e) { console.log('pickAnimalPhoto error:', e); }
     }
@@ -296,7 +300,7 @@ export default function DashboardScreen({ navigation }) {
 
         {/* Fish list */}
         {ls.fish.length > 0 && (<>
-          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🐟 FISH</Text>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🐟 {t.fishLabel?.toUpperCase()}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
             {ls.fish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
               const qty = ls.qtyMap?.[id + '_fish'] || 1;
@@ -320,7 +324,7 @@ export default function DashboardScreen({ navigation }) {
 
         {/* Inverts list */}
         {ls.inverts.length > 0 && (<>
-          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🦐 INVERTS</Text>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🦐 {t.invertsLabel?.toUpperCase()}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
             {ls.inverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
               const qty = ls.qtyMap?.[id + '_invert'] || 1;
@@ -344,7 +348,7 @@ export default function DashboardScreen({ navigation }) {
 
         {/* Corals list */}
         {ls.corals.length > 0 && (<>
-          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🪸 CORALS</Text>
+          <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🪸 {t.coralsLabel?.toUpperCase()}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             {ls.corals.map(id => {
               const isCustom = String(id).startsWith('custom_');

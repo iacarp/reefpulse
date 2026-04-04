@@ -39,8 +39,15 @@ export default function LivestockScreen({ navigation, route }) {
   useFocusEffect(useCallback(() => { load(); }, []));
 
   React.useEffect(() => {
-    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
-    return unsub;
+    // tabPress: coming from another tab
+    const unsubPress = navigation.addListener('tabPress', () => {
+      setSel(null); setTab('my'); setSearch('');
+    });
+    // tabReset: pressing the same active tab (from App.js screenListeners)
+    const unsubReset = navigation.addListener('tabReset', () => {
+      setSel(null); setTab('my'); setSearch('');
+    });
+    return () => { unsubPress(); unsubReset(); };
   }, [navigation]);
 
   const toggleFish = async (id) => { if (myFish.includes(id)) await removeLivestock(id, 'fish'); else await addLivestock(id, 'fish'); await load(); };

@@ -48,8 +48,9 @@ export default function CoralsScreen({ navigation }) {
   useFocusEffect(useCallback(() => { load(); }, []));
 
   React.useEffect(() => {
-    const unsub = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
-    return unsub;
+    const unsubPress = navigation.addListener('tabPress', () => { setSel(null); setTab('my'); setSearch(''); });
+    const unsubReset = navigation.addListener('tabReset', () => { setSel(null); setTab('my'); setSearch(''); });
+    return () => { unsubPress(); unsubReset(); };
   }, [navigation]);
 
   const toggleDB = async (id) => {
