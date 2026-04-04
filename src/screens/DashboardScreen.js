@@ -23,11 +23,13 @@ export default function DashboardScreen({ navigation }) {
   const [todayDueEq, setTodayDueEq] = useState([]);
   const [customCorals, setCustomCorals] = useState([]);
   const [tankPhoto, setTankPhoto] = useState(null);
+  const [animalPhotos, setAnimalPhotos] = useState({});
 
   const todayStr = new Date().toISOString().split('T')[0];
 
   const load = async () => {
     try { const p = await AsyncStorage.getItem('tank_photo'); if (p) setTankPhoto(p); } catch {}
+    try { const ap = await AsyncStorage.getItem('animal_photos'); if (ap) setAnimalPhotos(JSON.parse(ap)); } catch {}
     const ent = await getAllEntries();
     const livestock = await getMyLivestock();
     try { const cc = await AsyncStorage.getItem('custom_corals'); setCustomCorals(cc ? JSON.parse(cc) : []); } catch {}
@@ -111,6 +113,41 @@ export default function DashboardScreen({ navigation }) {
   const removePhoto = async () => {
     setTankPhoto(null);
     await AsyncStorage.removeItem('tank_photo');
+  };
+
+  const pickAnimalPhoto = async (animalId, type) => {
+    const key = `${type}_${animalId}`;
+    if (Platform.OS === 'web') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          const uri = ev.target.result;
+          const updated = { ...animalPhotos, [key]: uri };
+          setAnimalPhotos(updated);
+          await AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    } else {
+      try {
+        const ImagePicker = require('expo-image-picker');
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') { Alert.alert('Permission needed', 'Please allow access to your photo library.'); return; }
+        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.6 });
+        if (!result.canceled && result.assets[0]) {
+          const uri = result.assets[0].uri;
+          const updated = { ...animalPhotos, [key]: uri };
+          setAnimalPhotos(updated);
+          await AsyncStorage.setItem('animal_photos', JSON.stringify(updated));
+        }
+      } catch (e) { console.log('pickAnimalPhoto error:', e); }
+    }
   };
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
@@ -260,16 +297,22 @@ export default function DashboardScreen({ navigation }) {
         {/* Fish list */}
         {ls.fish.length > 0 && (<>
           <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🐟 FISH</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
             {ls.fish.map(id => { const f = FISH_DATABASE.find(x => x.id === id); if (!f) return null;
               const qty = ls.qtyMap?.[id + '_fish'] || 1;
+              const photoUri = animalPhotos[`fish_${id}`];
               return (
-                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'fish', ts: Date.now() })}
-                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
-                  <Text style={{ fontSize: 22 }}>{f.emoji || '🐟'}</Text>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
-                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
-                </TouchableOpacity>
+                <View key={id} style={{ alignItems: 'center', width: 68 }}>
+                  <TouchableOpacity onPress={() => pickAnimalPhoto(id, 'fish')}
+                    style={{ width: 64, height: 64, borderRadius: 14, backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                    {photoUri
+                      ? <Image source={{ uri: photoUri }} style={{ width: 64, height: 64 }} resizeMode="cover" />
+                      : <Text style={{ fontSize: 28 }}>🐟</Text>}
+                    {!photoUri && <View style={{ position: 'absolute', bottom: 2, right: 2, backgroundColor: '#06b6d4cc', borderRadius: 99, width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 10 }}>📷</Text></View>}
+                  </TouchableOpacity>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#06b6d4', borderRadius: 99, minWidth: 17, height: 17, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 }}><Text style={{ color: 'white', fontSize: 9, fontWeight: '700' }}>{qty}</Text></View>}
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{f.name.split(' ')[0]}</Text>
+                </View>
               );
             })}
           </View>
@@ -278,16 +321,22 @@ export default function DashboardScreen({ navigation }) {
         {/* Inverts list */}
         {ls.inverts.length > 0 && (<>
           <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🦐 INVERTS</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
             {ls.inverts.map(id => { const inv = INVERT_DATABASE.find(x => x.id === id); if (!inv) return null;
               const qty = ls.qtyMap?.[id + '_invert'] || 1;
+              const photoUri = animalPhotos[`invert_${id}`];
               return (
-                <TouchableOpacity key={id} onPress={() => navigation.navigate('Aquarium', { initialTab: 'inverts', ts: Date.now() })}
-                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60 }}>
-                  <Text style={{ fontSize: 22 }}>{inv.emoji || '🦐'}</Text>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>
-                  {qty > 1 && <View style={{ position: 'absolute', top: 2, right: 2, backgroundColor: '#06b6d4', borderRadius: 8, width: 14, height: 14, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: 'white', fontSize: 8, fontWeight: '700' }}>{qty}</Text></View>}
-                </TouchableOpacity>
+                <View key={id} style={{ alignItems: 'center', width: 68 }}>
+                  <TouchableOpacity onPress={() => pickAnimalPhoto(id, 'invert')}
+                    style={{ width: 64, height: 64, borderRadius: 14, backgroundColor: '#1e293b', borderWidth: 1, borderColor: '#334155', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                    {photoUri
+                      ? <Image source={{ uri: photoUri }} style={{ width: 64, height: 64 }} resizeMode="cover" />
+                      : <Text style={{ fontSize: 28 }}>🦐</Text>}
+                    {!photoUri && <View style={{ position: 'absolute', bottom: 2, right: 2, backgroundColor: '#06b6d4cc', borderRadius: 99, width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 10 }}>📷</Text></View>}
+                  </TouchableOpacity>
+                  {qty > 1 && <View style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#06b6d4', borderRadius: 99, minWidth: 17, height: 17, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 }}><Text style={{ color: 'white', fontSize: 9, fontWeight: '700' }}>{qty}</Text></View>}
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{inv.name.split(' ')[0]}</Text>
+                </View>
               );
             })}
           </View>
@@ -296,21 +345,25 @@ export default function DashboardScreen({ navigation }) {
         {/* Corals list */}
         {ls.corals.length > 0 && (<>
           <Text style={{ color: '#475569', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 8 }}>🪸 CORALS</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             {ls.corals.map(id => {
               const isCustom = String(id).startsWith('custom_');
-              const c = isCustom
-                ? customCorals.find(x => `custom_${x.id}` === id)
-                : CORAL_DATABASE.find(x => x.id === id);
+              const c = isCustom ? customCorals.find(x => `custom_${x.id}` === id) : CORAL_DATABASE.find(x => x.id === id);
               if (!c) return null;
               const tc = { SPS: '#ef4444', LPS: '#f59e0b', Soft: '#10b981', Anemone: '#8b5cf6' };
               const type = isCustom ? c.category : c.type;
+              const photoUri = animalPhotos[`coral_${id}`];
               return (
-                <TouchableOpacity key={id} onPress={() => navigation.navigate('Corals')}
-                  style={{ backgroundColor: '#1e293b', borderRadius: 10, padding: 8, alignItems: 'center', minWidth: 60, borderBottomWidth: 2, borderBottomColor: tc[type] || '#334155' }}>
-                  <Text style={{ fontSize: 22 }}>{c.emoji || '🪸'}</Text>
-                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 3, textAlign: 'center' }} numberOfLines={1}>{c.name.split(' ')[0]}</Text>
-                </TouchableOpacity>
+                <View key={id} style={{ alignItems: 'center', width: 68 }}>
+                  <TouchableOpacity onPress={() => pickAnimalPhoto(String(id), 'coral')}
+                    style={{ width: 64, height: 64, borderRadius: 14, backgroundColor: '#1e293b', borderWidth: 2, borderColor: tc[type] || '#334155', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                    {photoUri
+                      ? <Image source={{ uri: photoUri }} style={{ width: 64, height: 64 }} resizeMode="cover" />
+                      : <Text style={{ fontSize: 28 }}>🪸</Text>}
+                    {!photoUri && <View style={{ position: 'absolute', bottom: 2, right: 2, backgroundColor: `${tc[type] || '#334155'}cc`, borderRadius: 99, width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 10 }}>📷</Text></View>}
+                  </TouchableOpacity>
+                  <Text style={{ color: '#94a3b8', fontSize: 9, marginTop: 4, textAlign: 'center' }} numberOfLines={1}>{c.name.split(' ')[0]}</Text>
+                </View>
               );
             })}
           </View>
